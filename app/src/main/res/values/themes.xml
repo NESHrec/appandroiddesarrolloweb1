@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema de la ventana; la UI usa ClinicaSerenaTheme (Compose, Material 3). -->
+    <style name="Theme.ClinicaSerena" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/serena_fondo</item>
+    </style>
+</resources>

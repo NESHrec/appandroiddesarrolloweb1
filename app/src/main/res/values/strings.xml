@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="es">
+    <string name="app_name">Clínica Serena</string>
+
+    <!-- Estados comunes -->
+    <string name="estado_cargando">Cargando…</string>
+    <string name="estado_verificando_sesion">Verificando tu sesión…</string>
+    <string name="estado_vacio_titulo">Sin información</string>
+    <string name="estado_error_titulo">No se pudo completar</string>
+    <string name="estado_reintentar">Reintentar</string>
+    <string name="estado_sesion_vencida_titulo">Tu sesión venció</string>
+    <string name="estado_sesion_vencida_mensaje">Por seguridad, la sesión dura 30 minutos. Inicia sesión de nuevo para continuar.</string>
+    <string name="estado_iniciar_sesion">Iniciar sesión</string>
+    <string name="estado_permiso_denegado_titulo">Acceso denegado</string>
+    <string name="estado_exito_titulo">Listo</string>
+
+    <!-- Errores de red y servidor -->
+    <string name="error_sin_conexion">No hay conexión con el servidor. Revisa tu red e inténtalo de nuevo.</string>
+    <string name="error_servidor">El servidor no está disponible en este momento. Inténtalo más tarde.</string>
+    <string name="error_inesperado">Ocurrió un error inesperado. Inténtalo de nuevo.</string>
+    <string name="error_credenciales">Correo o contraseña incorrectos.</string>
+    <string name="error_permiso">No tienes permiso para esta operación.</string>
+    <string name="error_no_encontrado">No se encontró la información solicitada.</string>
+    <string name="error_datos_invalidos">Revisa los datos ingresados.</string>
+    <string name="error_inicio_sesion_titulo">No pudimos verificar tu sesión</string>
+
+    <!-- Acceso -->
+    <string name="login_titulo">Clínica Serena</string>
+    <string name="login_subtitulo">Citas y expediente para pacientes y médicos</string>
+    <string name="login_pendiente">El inicio de sesión se habilita en la Fase B.</string>
+    <string name="login_rol_no_soportado">Esta app es solo para pacientes y médicos. Usa la aplicación web para tareas de administración o recepción.</string>
+
+    <!-- Diagnóstico (solo debug) -->
+    <string name="diagnostico_titulo">Diagnóstico (solo debug)</string>
+    <string name="diagnostico_url">API: %1$s</string>
+    <string name="diagnostico_ok">Backend disponible (%1$s)</string>
+    <string name="diagnostico_verificando">Consultando /health…</string>
+
+    <!-- Navegación PACIENTE -->
+    <string name="nav_inicio">Inicio</string>
+    <string name="nav_citas">Citas</string>
+    <string name="nav_expediente">Mi expediente</string>
+    <string name="nav_recetas">Recetas</string>
+
+    <!-- Navegación MEDICO -->
+    <string name="nav_agenda">Agenda</string>
+    <string name="nav_perfil">Perfil</string>
+
+    <!-- Secciones pendientes -->
+    <string name="pendiente_titulo">Sección en preparación</string>
+    <string name="pendiente_mensaje">Esta sección se habilita en la %1$s. Todavía no muestra datos.</string>
+    <string name="fase_b">Fase B</string>
+    <string name="fase_c">Fase C</string>
+</resources>

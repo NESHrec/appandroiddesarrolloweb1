@@ -1,0 +1,37 @@
+# Gradle y compilación
+.gradle/
+.kotlin/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Configuración local (ruta del SDK, propiedades de la máquina)
+local.properties
+
+# Android Studio / IntelliJ
+*.iml
+.idea/
+.navigation/
+
+# Artefactos de distribución
+*.apk
+*.aab
+*.ap_
+output-metadata.json
+
+# Firmas y secretos
+*.jks
+*.keystore
+*.p12
+.env
+.env.*
+secrets.properties
+cuentas-prueba.env
+
+# Informes y notas locales
+/informes-locales/
+*.local.md
+
+# Sistema operativo
+.DS_Store
