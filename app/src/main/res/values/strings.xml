@@ -18,23 +18,93 @@
     <string name="error_sin_conexion">No hay conexión con el servidor. Revisa tu red e inténtalo de nuevo.</string>
     <string name="error_servidor">El servidor no está disponible en este momento. Inténtalo más tarde.</string>
     <string name="error_inesperado">Ocurrió un error inesperado. Inténtalo de nuevo.</string>
-    <string name="error_credenciales">Correo o contraseña incorrectos.</string>
+    <string name="error_credenciales">Correo o contraseña incorrectos. Si acabas de registrarte, primero confirma tu correo desde el enlace que te enviamos. Si fallaste varias veces, espera un minuto e inténtalo de nuevo.</string>
     <string name="error_permiso">No tienes permiso para esta operación.</string>
     <string name="error_no_encontrado">No se encontró la información solicitada.</string>
     <string name="error_datos_invalidos">Revisa los datos ingresados.</string>
     <string name="error_inicio_sesion_titulo">No pudimos verificar tu sesión</string>
 
+    <!-- Campos y validación -->
+    <string name="campo_correo">Correo electrónico</string>
+    <string name="campo_contrasena">Contraseña</string>
+    <string name="campo_confirmar_contrasena">Confirmar contraseña</string>
+    <string name="campo_nombre_completo">Nombre completo</string>
+    <string name="campo_mostrar_contrasena">Mostrar contraseña</string>
+    <string name="campo_ocultar_contrasena">Ocultar contraseña</string>
+    <string name="validacion_correo_obligatorio">Escribe tu correo.</string>
+    <string name="validacion_correo_invalido">Escribe un correo válido, por ejemplo nombre@dominio.com.</string>
+    <string name="validacion_correo_largo">El correo no puede tener más de 254 caracteres.</string>
+    <string name="validacion_contrasena_obligatoria">Escribe tu contraseña.</string>
+    <string name="validacion_contrasena_longitud">La contraseña debe tener entre 8 y 72 caracteres.</string>
+    <string name="validacion_contrasenas_distintas">Las contraseñas no coinciden.</string>
+    <string name="validacion_nombre_obligatorio">Escribe tu nombre completo.</string>
+    <string name="validacion_nombre_largo">El nombre no puede tener más de 160 caracteres.</string>
+
     <!-- Acceso -->
     <string name="login_titulo">Clínica Serena</string>
     <string name="login_subtitulo">Citas y expediente para pacientes y médicos</string>
-    <string name="login_pendiente">El inicio de sesión se habilita en la Fase B.</string>
+    <string name="login_boton">Iniciar sesión</string>
+    <string name="login_crear_cuenta">Crear cuenta de paciente</string>
+    <string name="login_olvide_contrasena">¿Olvidaste tu contraseña?</string>
+    <string name="login_reenviar_verificacion">Reenviar correo de verificación</string>
     <string name="login_rol_no_soportado">Esta app es solo para pacientes y médicos. Usa la aplicación web para tareas de administración o recepción.</string>
+    <string name="login_cerrado_local_titulo">Sesión cerrada en este dispositivo</string>
+    <string name="login_cerrado_local_mensaje">No pudimos avisar al servidor. Tu sesión allí vencerá sola en un máximo de 30 minutos.</string>
+
+    <!-- Registro -->
+    <string name="registro_titulo">Crear cuenta de paciente</string>
+    <string name="registro_explicacion">Te enviaremos un correo para verificar tu cuenta. La verificación se completa desde el enlace de ese correo.</string>
+    <string name="registro_boton">Crear cuenta</string>
+    <string name="registro_enviado_titulo">Revisa tu correo</string>
+    <string name="registro_enviado_mensaje">Si los datos son válidos, te enviamos un correo. Abre el enlace para verificar tu cuenta; después podrás iniciar sesión aquí.</string>
+
+    <!-- Recuperación y reenvío -->
+    <string name="recuperar_titulo">Recuperar contraseña</string>
+    <string name="recuperar_explicacion">Escribe tu correo. Si la cuenta existe, te enviaremos un enlace para crear una nueva contraseña; ese paso se completa desde el enlace del correo.</string>
+    <string name="recuperar_boton">Enviar enlace</string>
+    <string name="recuperar_enviado_mensaje">Si la cuenta existe, te enviamos un correo. Abre el enlace para crear una nueva contraseña y luego inicia sesión aquí.</string>
+    <string name="reenviar_titulo">Reenviar verificación</string>
+    <string name="reenviar_explicacion">Escribe el correo con el que te registraste. Si la cuenta aún no está verificada, te enviaremos un nuevo enlace.</string>
+    <string name="reenviar_boton">Reenviar correo</string>
+    <string name="reenviar_enviado_mensaje">Si la cuenta necesita verificación, te enviamos un correo. Abre el enlace para verificarla y luego inicia sesión aquí.</string>
+    <string name="volver_a_inicio_sesion">Volver a iniciar sesión</string>
+    <string name="navegar_atras">Atrás</string>
+
+    <!-- Re-login -->
+    <string name="reauth_mensaje">Por seguridad, la sesión dura 30 minutos. Escribe tu contraseña para continuar donde estabas.</string>
+    <string name="reauth_cuenta">Cuenta: %1$s</string>
+    <string name="reauth_continuar">Continuar</string>
+    <string name="reauth_salir">Cerrar sesión</string>
+
+    <!-- Cierre de sesión -->
+    <string name="logout_boton">Cerrar sesión</string>
+    <string name="logout_fallo_titulo">No se pudo cerrar la sesión en el servidor</string>
+    <string name="logout_fallo_explicacion">Puedes reintentar o cerrar solo en este dispositivo. En ese caso, la sesión en el servidor vencerá sola en un máximo de 30 minutos.</string>
+    <string name="logout_solo_local">Cerrar solo en este dispositivo</string>
+
+    <!-- Perfil -->
+    <string name="perfil_titulo">Mi perfil</string>
+    <string name="perfil_nombre">Nombre</string>
+    <string name="perfil_correo">Correo</string>
+    <string name="perfil_estado_cuenta">Estado de la cuenta</string>
+    <string name="perfil_registrado">Registrado</string>
+    <string name="perfil_rol">Rol</string>
+    <string name="perfil_actualizar">Actualizar</string>
+    <string name="perfil_cuenta_activa">Activa</string>
+    <string name="rol_medico">Médico</string>
+    <string name="vinculacion_ok_titulo">Cuenta vinculada</string>
+    <string name="vinculacion_ok_mensaje">Tu cuenta está vinculada a tu perfil profesional.</string>
+    <string name="vinculacion_pendiente_titulo">Vinculación pendiente</string>
+    <string name="vinculacion_pendiente_mensaje">Tu cuenta aún no está vinculada a un profesional. Pide a administración que la vincule; mientras tanto no podrás ver la agenda.</string>
 
     <!-- Diagnóstico (solo debug) -->
     <string name="diagnostico_titulo">Diagnóstico (solo debug)</string>
+    <string name="diagnostico_mostrar">Mostrar diagnóstico (solo debug)</string>
+    <string name="diagnostico_ocultar">Ocultar diagnóstico</string>
     <string name="diagnostico_url">API: %1$s</string>
     <string name="diagnostico_ok">Backend disponible (%1$s)</string>
     <string name="diagnostico_verificando">Consultando /health…</string>
+    <string name="debug_simular_vencida">Simular sesión vencida (solo debug)</string>
 
     <!-- Navegación PACIENTE -->
     <string name="nav_inicio">Inicio</string>

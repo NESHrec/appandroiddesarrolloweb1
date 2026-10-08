@@ -6,12 +6,24 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 
-/** Endpoints de sesión verificados en el código de Spring (`AuthController`, `StaffAuthController`). */
+/** Endpoints de sesión verificados en el código de Spring (`PatientAuthController`, `StaffController`). */
 interface AuthApi {
 
     @PublicEndpoint
     @POST("auth/login-unified")
     suspend fun loginUnified(@Body body: LoginRequest): Response<UnifiedLoginResponse>
+
+    @PublicEndpoint
+    @POST("auth/register")
+    suspend fun register(@Body body: RegisterRequest): Response<GenericMessageResponse>
+
+    @PublicEndpoint
+    @POST("auth/resend-verification")
+    suspend fun resendVerification(@Body body: EmailRequest): Response<GenericMessageResponse>
+
+    @PublicEndpoint
+    @POST("auth/password-recovery")
+    suspend fun passwordRecovery(@Body body: EmailRequest): Response<GenericMessageResponse>
 
     @GET("auth/me")
     suspend fun patientMe(): Response<PatientIdentityResponse>

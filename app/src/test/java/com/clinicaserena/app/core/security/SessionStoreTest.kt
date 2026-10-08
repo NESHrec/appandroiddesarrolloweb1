@@ -31,7 +31,14 @@ class SessionStoreTest {
         )
     }
 
-    private val session = Session("token-abc", AccountType.PERSONAL, Role.MEDICO, Instant.parse("2026-10-07T07:00:00Z"))
+    private val session = Session(
+        token = "token-abc",
+        accountType = AccountType.PERSONAL,
+        role = Role.MEDICO,
+        expiresAt = Instant.parse("2026-10-07T07:00:00Z"),
+        subjectId = "cuenta-1",
+        email = "medico@ejemplo.invalid",
+    )
 
     @After
     fun tearDown() = scope.cancel()

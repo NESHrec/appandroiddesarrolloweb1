@@ -2,8 +2,13 @@ package com.clinicaserena.app.feature.common
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -35,18 +40,33 @@ data class TopLevelDestination(
  * Barra inferior + NavHost de un rol. Cada rol tiene su propio grafo: una ruta de paciente no existe
  * en el grafo del médico y viceversa, así que no se puede abrir la sección del otro rol.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoleNavScaffold(
     destinations: List<TopLevelDestination>,
     startDestination: Any,
     navController: NavHostController = rememberNavController(),
+    topBarActions: @Composable RowScope.(NavHostController) -> Unit = {},
     builder: NavGraphBuilder.() -> Unit,
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
+    val currentTopLevel = destinations.firstOrNull { destination ->
+        currentDestination?.hierarchy?.any { it.hasRoute(destination.route::class) } == true
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            // Las pantallas secundarias (perfil, detalle) traen su propia barra con Atrás.
+            if (currentTopLevel != null) {
+                TopAppBar(
+                    title = { Text(stringResource(currentTopLevel.labelRes)) },
+                    actions = { topBarActions(navController) },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
+                )
+            }
+        },
         bottomBar = {
             NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                 destinations.forEach { destination ->
@@ -74,7 +94,8 @@ fun RoleNavScaffold(
         NavHost(
             navController = navController,
             startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding),
+            // consumeWindowInsets: las barras propias de pantallas secundarias no repiten el margen superior.
+            modifier = Modifier.padding(innerPadding).consumeWindowInsets(innerPadding),
             builder = builder,
         )
     }

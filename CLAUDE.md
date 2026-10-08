@@ -45,7 +45,9 @@
 - Médico de prueba vinculado a la Dra. Elena Morales (Odontología general, practitionerId 20000000-0000-0000-0000-000000000001).
 - Verificado en vivo: Spring devuelve las fechas en UTC con Z (ej. 2026-10-07T06:11:00Z) y acepta scheduledAt en Z.
 - Verificado en vivo (A2): ruta inexistente con sesión → 403 FORBIDDEN si queda fuera de los prefijos permitidos al rol (paciente → /ruta-que-no-existe), pero 404 RESOURCE_NOT_FOUND si queda dentro de uno permitido (médico → /medico/ruta-que-no-existe); sin sesión → 401 UNAUTHENTICATED. Un bloque libre deja de aparecer en disponibilidad en cuanto inicia (para probar reservas se necesitan bloques futuros creados por el médico).
-- Según el código del backend, pendiente de verificar en vivo: cita de otro médico → 404 (no 403), en la Fase C con dos médicos; respuesta del login bloqueado por intentos fallidos, en la Fase B (la pantalla de login debe manejarla).
+- Verificado en vivo (B1): tras 5 fallos de login con el mismo correo, incluso la contraseña correcta recibe 401 AUTHENTICATION_FAILED (idéntico a credenciales incorrectas) durante 60 s; después vuelve a entrar (200). Un paciente sin verificar recibe el mismo 401. La app muestra un único mensaje que cubre los tres casos.
+- Según el código del backend, pendiente de verificar en vivo: cita de otro médico → 404 (no 403), en la Fase C con dos médicos.
+- Cuentas de prueba: además de paciente, ADMIN, médico y recepción, existe Paciente 2 (registrado desde la app en B1, sin citas).
 
 ## Git
 - No hacer commit ni push sin que yo lo pida.

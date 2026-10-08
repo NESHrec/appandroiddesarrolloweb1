@@ -34,6 +34,8 @@ class SessionStore(
             accountType = session.accountType.name,
             role = session.role.name,
             expiresAtEpochSeconds = session.expiresAt.epochSecond,
+            subjectId = session.subjectId,
+            email = session.email,
         )
         val payload = cipher.encrypt(json.encodeToString(StoredSession.serializer(), record).toByteArray())
         dataStore.edit { prefs ->
@@ -85,14 +87,19 @@ class SessionStore(
         accountType = AccountType.valueOf(accountType),
         role = Role.valueOf(role),
         expiresAt = Instant.ofEpochSecond(expiresAtEpochSeconds),
+        subjectId = subjectId,
+        email = email,
     )
 
+    /** Un registro con otro formato (por ejemplo, de la Fase A) no se decodifica y se descarta. */
     @Serializable
     private data class StoredSession(
         val token: String,
         val accountType: String,
         val role: String,
         val expiresAtEpochSeconds: Long,
+        val subjectId: String,
+        val email: String,
     )
 
     private companion object {

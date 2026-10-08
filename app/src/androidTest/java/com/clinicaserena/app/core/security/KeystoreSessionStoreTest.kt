@@ -50,18 +50,19 @@ class KeystoreSessionStoreTest {
 
     @Test
     fun elTokenNoQuedaEnTextoPlanoEnDisco() = runBlocking {
-        val session = Session(token, AccountType.PACIENTE, Role.PACIENTE, Instant.parse("2026-10-07T07:00:00Z"))
+        val session = Session(token, AccountType.PACIENTE, Role.PACIENTE, Instant.parse("2026-10-07T07:00:00Z"), "paciente-1", "paciente@ejemplo.invalid")
         store.save(session)
 
         val bytes = file.readBytes().decodeToString()
         assertFalse(bytes.contains(token))
         assertFalse(bytes.contains("PACIENTE"))
+        assertFalse(bytes.contains("paciente@ejemplo.invalid"))
         assertEquals(session, store.load())
     }
 
     @Test
     fun siSeBorraLaClaveLaSesionSeDescartaSinFallar() = runBlocking {
-        store.save(Session(token, AccountType.PERSONAL, Role.MEDICO, Instant.parse("2026-10-07T07:00:00Z")))
+        store.save(Session(token, AccountType.PERSONAL, Role.MEDICO, Instant.parse("2026-10-07T07:00:00Z"), "cuenta-1", "medico@ejemplo.invalid"))
         cipher.deleteKey()
 
         assertNull(store.load())

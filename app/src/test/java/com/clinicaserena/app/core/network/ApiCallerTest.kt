@@ -4,6 +4,8 @@ import com.clinicaserena.app.data.auth.AuthApi
 import com.clinicaserena.app.data.auth.RemoteAuthRepository
 import com.clinicaserena.app.data.auth.UnifiedLogin
 import com.clinicaserena.app.domain.model.AccountType
+import com.clinicaserena.app.domain.model.Identity
+import com.clinicaserena.app.domain.model.PractitionerLinkStatus
 import com.clinicaserena.app.domain.model.Role
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -63,10 +65,76 @@ class ApiCallerTest {
     fun `401 UNAUTHENTICATED en peticion autenticada vence la sesion`() = runTest {
         rig.enqueue(401, ApiTestRig.error(401, "UNAUTHENTICATED"))
 
-        val result = authRepository.currentRole(AccountType.PACIENTE)
+        val result = authRepository.currentIdentity(AccountType.PACIENTE)
 
         assertTrue(result is ApiResult.Unauthenticated)
         assertEquals(1, rig.expiredCount)
+    }
+
+    @Test
+    fun `identidad de personal trae rol y vinculacion`() = runTest {
+        rig.enqueue(
+            200,
+            """{"accountId":"c1","email":"m@ejemplo.invalid","fullName":"Medico","role":"MEDICO","practitionerLinkStatus":"VINCULADA","practitionerId":"p1"}""",
+        )
+
+        val result = authRepository.currentIdentity(AccountType.PERSONAL)
+
+        assertEquals(
+            ApiResult.Success(Identity("c1", "m@ejemplo.invalid", Role.MEDICO, "Medico", PractitionerLinkStatus.VINCULADA)),
+            result,
+        )
+        assertEquals("/api/v1/staff/auth/me", rig.server.takeRequest().url.encodedPath)
+    }
+
+    @Test
+    fun `401 en logout no abre el re-login`() = runTest {
+        rig.enqueue(401, ApiTestRig.error(401, "UNAUTHENTICATED"))
+
+        val result = authRepository.logout(AccountType.PACIENTE)
+
+        assertTrue(result is ApiResult.Unauthenticated)
+        assertEquals(0, rig.expiredCount)
+        assertEquals("Bearer ${ApiTestRig.TOKEN}", rig.server.takeRequest().headers["Authorization"])
+    }
+
+    @Test
+    fun `registro, reenvio y recuperacion son publicos y envian solo los campos del contrato`() = runTest {
+        val generic = """{"message":"Si la solicitud es válida, recibirás un correo con los pasos siguientes."}"""
+        repeat(3) { rig.enqueue(202, generic) }
+
+        assertTrue(authRepository.register("Ana Prueba", "ana@ejemplo.invalid", "clave-123") is ApiResult.Success)
+        assertTrue(authRepository.resendVerification("ana@ejemplo.invalid") is ApiResult.Success)
+        assertTrue(authRepository.requestPasswordRecovery("ana@ejemplo.invalid") is ApiResult.Success)
+
+        val register = rig.server.takeRequest()
+        assertEquals("/api/v1/auth/register", register.url.encodedPath)
+        assertNull(register.headers["Authorization"])
+        assertEquals(
+            """{"nombre":"Ana Prueba","email":"ana@ejemplo.invalid","password":"clave-123"}""",
+            register.body?.utf8(),
+        )
+        val resend = rig.server.takeRequest()
+        assertEquals("/api/v1/auth/resend-verification", resend.url.encodedPath)
+        assertEquals("""{"email":"ana@ejemplo.invalid"}""", resend.body?.utf8())
+        val recovery = rig.server.takeRequest()
+        assertEquals("/api/v1/auth/password-recovery", recovery.url.encodedPath)
+        assertNull(recovery.headers["Authorization"])
+    }
+
+    @Test
+    fun `registro con errores por campo de Spring`() = runTest {
+        rig.enqueue(
+            400,
+            """{"status":400,"code":"VALIDATION_ERROR","message":"Datos inválidos","fieldErrors":[{"field":"password","message":"tamaño inválido"}]}""",
+        )
+
+        val result = authRepository.register("Ana", "ana@ejemplo.invalid", "corta")
+
+        assertEquals(
+            ApiResult.Validation("Datos inválidos", listOf(FieldError("password", "tamaño inválido"))),
+            result,
+        )
     }
 
     @Test

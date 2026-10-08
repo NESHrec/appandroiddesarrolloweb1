@@ -15,6 +15,9 @@ import com.clinicaserena.app.data.auth.AuthRepository
 import com.clinicaserena.app.data.auth.RemoteAuthRepository
 import com.clinicaserena.app.data.health.HealthApi
 import com.clinicaserena.app.data.health.HealthRepository
+import com.clinicaserena.app.data.patient.PatientProfileApi
+import com.clinicaserena.app.data.patient.PatientProfileRepository
+import com.clinicaserena.app.data.patient.RemotePatientProfileRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -66,6 +69,10 @@ class AppContainer(context: Context) {
 
     val healthRepository: HealthRepository by lazy {
         HealthRepository(retrofit.create(HealthApi::class.java), apiCaller)
+    }
+
+    val patientProfileRepository: PatientProfileRepository by lazy {
+        RemotePatientProfileRepository(retrofit.create(PatientProfileApi::class.java), apiCaller)
     }
 
     private companion object {

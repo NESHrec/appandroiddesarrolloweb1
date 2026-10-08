@@ -63,6 +63,7 @@ fun EmptyState(
     message: String,
     modifier: Modifier = Modifier,
     title: String = stringResource(R.string.estado_vacio_titulo),
+    scrollable: Boolean = true,
 ) {
     StatusPanel(
         iconRes = R.drawable.ic_info,
@@ -70,6 +71,7 @@ fun EmptyState(
         message = message,
         background = LocalStatusColors.current.info,
         modifier = modifier,
+        scrollable = scrollable,
     )
 }
 
@@ -79,6 +81,7 @@ fun ErrorState(
     onRetry: (() -> Unit)?,
     modifier: Modifier = Modifier,
     title: String = stringResource(R.string.estado_error_titulo),
+    scrollable: Boolean = true,
 ) {
     StatusPanel(
         iconRes = R.drawable.ic_error,
@@ -86,32 +89,35 @@ fun ErrorState(
         message = message,
         background = LocalStatusColors.current.error,
         modifier = modifier,
+        scrollable = scrollable,
         actionLabel = onRetry?.let { stringResource(R.string.estado_reintentar) },
         onAction = onRetry,
     )
 }
 
 @Composable
-fun SessionExpiredState(onLogin: () -> Unit, modifier: Modifier = Modifier) {
+fun SessionExpiredState(onLogin: () -> Unit, modifier: Modifier = Modifier, scrollable: Boolean = true) {
     StatusPanel(
         iconRes = R.drawable.ic_schedule,
         title = stringResource(R.string.estado_sesion_vencida_titulo),
         message = stringResource(R.string.estado_sesion_vencida_mensaje),
         background = LocalStatusColors.current.warning,
         modifier = modifier,
+        scrollable = scrollable,
         actionLabel = stringResource(R.string.estado_iniciar_sesion),
         onAction = onLogin,
     )
 }
 
 @Composable
-fun ForbiddenState(message: String, modifier: Modifier = Modifier) {
+fun ForbiddenState(message: String, modifier: Modifier = Modifier, scrollable: Boolean = true) {
     StatusPanel(
         iconRes = R.drawable.ic_lock,
         title = stringResource(R.string.estado_permiso_denegado_titulo),
         message = message,
         background = LocalStatusColors.current.error,
         modifier = modifier,
+        scrollable = scrollable,
     )
 }
 
@@ -153,7 +159,10 @@ fun StatusBanner(
     }
 }
 
-/** Estado de pantalla completa, desplazable para fuentes grandes y pantallas pequeñas. */
+/**
+ * Estado de pantalla completa, desplazable para fuentes grandes y pantallas pequeñas. Dentro de una
+ * columna que ya se desplaza se usa `scrollable = false` (dos scroll verticales anidados fallan).
+ */
 @Composable
 private fun StatusPanel(
     @DrawableRes iconRes: Int,
@@ -163,11 +172,12 @@ private fun StatusPanel(
     modifier: Modifier = Modifier,
     actionLabel: String? = null,
     onAction: (() -> Unit)? = null,
+    scrollable: Boolean = true,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .then(if (scrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier)
             .padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
