@@ -14,7 +14,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.clinicaserena.app.R
 import com.clinicaserena.app.core.ui.LocalAppContainer
-import com.clinicaserena.app.feature.common.PendingFeatureScreen
 import com.clinicaserena.app.feature.common.RoleNavScaffold
 import com.clinicaserena.app.feature.common.TopLevelDestination
 import com.clinicaserena.app.feature.patient.appointments.AppointmentDetailScreen
@@ -26,6 +25,10 @@ import com.clinicaserena.app.feature.patient.booking.BookingScreen
 import com.clinicaserena.app.feature.patient.booking.BookingViewModel
 import com.clinicaserena.app.feature.patient.profile.PatientProfileScreen
 import com.clinicaserena.app.feature.patient.profile.PatientProfileViewModel
+import com.clinicaserena.app.feature.patient.record.MyRecordScreen
+import com.clinicaserena.app.feature.patient.record.MyRecordViewModel
+import com.clinicaserena.app.feature.patient.record.PrescriptionsScreen
+import com.clinicaserena.app.feature.patient.record.PrescriptionsViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable data object PatientHomeRoute
@@ -108,8 +111,14 @@ fun PatientNavHost() {
                 },
             )
         }
-        composable<PatientRecordRoute> { PendingFeatureScreen() }
-        composable<PatientPrescriptionsRoute> { PendingFeatureScreen() }
+        composable<PatientRecordRoute> {
+            MyRecordScreen(viewModel = viewModel { MyRecordViewModel(container.patientClinicalRepository, container.sessionManager) })
+        }
+        composable<PatientPrescriptionsRoute> {
+            PrescriptionsScreen(
+                viewModel = viewModel { PrescriptionsViewModel(container.patientClinicalRepository, container.sessionManager) },
+            )
+        }
         composable<PatientProfileRoute> {
             PatientProfileScreen(
                 viewModel = viewModel {

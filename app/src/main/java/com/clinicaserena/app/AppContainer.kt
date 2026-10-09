@@ -21,7 +21,10 @@ import com.clinicaserena.app.data.patient.AppointmentsApi
 import com.clinicaserena.app.data.patient.AppointmentsRepository
 import com.clinicaserena.app.data.patient.RemoteAppointmentsRepository
 import com.clinicaserena.app.data.health.HealthRepository
+import com.clinicaserena.app.data.patient.PatientClinicalApi
+import com.clinicaserena.app.data.patient.PatientClinicalRepository
 import com.clinicaserena.app.data.patient.PatientProfileApi
+import com.clinicaserena.app.data.patient.RemotePatientClinicalRepository
 import com.clinicaserena.app.data.patient.PatientProfileRepository
 import com.clinicaserena.app.data.patient.RemotePatientProfileRepository
 import kotlinx.coroutines.CoroutineScope
@@ -85,6 +88,10 @@ class AppContainer(context: Context) {
 
     val appointmentsRepository: AppointmentsRepository by lazy {
         RemoteAppointmentsRepository(retrofit.create(AppointmentsApi::class.java), apiCaller)
+    }
+
+    val patientClinicalRepository: PatientClinicalRepository by lazy {
+        RemotePatientClinicalRepository(retrofit.create(PatientClinicalApi::class.java), apiCaller)
     }
 
     val patientProfileRepository: PatientProfileRepository by lazy {

@@ -181,4 +181,49 @@
     <string name="reserva_exito_titulo">Cita reservada</string>
     <string name="reserva_exito_mensaje">La clínica confirmó tu reserva. Puedes verla en Mis citas.</string>
     <string name="reserva_volver_inicio">Volver</string>
+
+    <!-- Recetas -->
+    <string name="recetas_vacio_titulo">Aún no tienes recetas</string>
+    <string name="recetas_vacio_mensaje">Aparecerán aquí cuando un médico registre una receta en tu atención.</string>
+    <string name="receta_emitida">Receta del %1$s</string>
+    <string name="receta_cita">Cita</string>
+    <string name="receta_sin_medicamentos">Sin medicamentos indicados.</string>
+    <string name="receta_item_detalle">%1$s · %2$s · %3$s</string>
+    <string name="receta_instrucciones">Indicaciones: %1$s</string>
+
+    <!-- Mi expediente -->
+    <string name="expediente_tab_resumen">Resumen</string>
+    <string name="expediente_tab_atenciones">Atenciones</string>
+    <string name="expediente_tab_seguimientos">Seguimientos</string>
+    <string name="expediente_solo_lectura_titulo">Solo lectura</string>
+    <string name="expediente_solo_lectura_mensaje">Esta información la registra tu médico. Si ves un error, coméntalo en tu próxima cita.</string>
+    <string name="expediente_vacio_titulo">Tu expediente aún no tiene información</string>
+    <string name="expediente_vacio_mensaje">Tu expediente se crea con tu primera atención en la clínica.</string>
+    <string name="expediente_sin_perfil">Aún no hay un perfil clínico registrado.</string>
+    <string name="expediente_perfil_vigente">Perfil clínico vigente</string>
+    <string name="expediente_versiones_anteriores">Versiones anteriores del perfil</string>
+    <string name="expediente_alergias">Alergias</string>
+    <string name="expediente_condiciones">Condiciones relevantes</string>
+    <string name="expediente_medicamentos_actuales">Medicamentos actuales</string>
+    <string name="expediente_antecedentes_odontologicos">Antecedentes odontológicos</string>
+    <string name="expediente_sin_dato">Sin registro</string>
+    <string name="expediente_registrado_por">Registrado el %1$s por %2$s</string>
+    <string name="expediente_sin_atenciones">Aún no tienes atenciones registradas.</string>
+    <string name="expediente_atencion_del">Atención del %1$s</string>
+    <string name="expediente_motivo">Motivo</string>
+    <string name="expediente_hallazgos">Hallazgos</string>
+    <string name="expediente_diagnostico">Diagnóstico</string>
+    <string name="expediente_plan">Plan de tratamiento</string>
+    <string name="expediente_receta">Receta</string>
+    <string name="expediente_adendas">Adendas</string>
+    <string name="expediente_adenda_motivo">Motivo de la adenda: %1$s</string>
+    <string name="expediente_sin_seguimientos">Aún no tienes seguimientos. Aparecen después de cada atención.</string>
+
+    <!-- Perfil: cambio de nombre -->
+    <string name="perfil_cambiar_nombre">Cambiar nombre</string>
+    <string name="perfil_guardar_nombre">Guardar nombre</string>
+    <string name="perfil_cancelar">Cancelar</string>
+    <string name="perfil_nombre_corto">El nombre debe tener al menos 2 caracteres.</string>
+    <string name="perfil_nombre_actualizado">Tu nombre se actualizó.</string>
+    <string name="perfil_esperando_sesion">Inicia sesión de nuevo y guardaremos el nombre que escribiste.</string>
 </resources>

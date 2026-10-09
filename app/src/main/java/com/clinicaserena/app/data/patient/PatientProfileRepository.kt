@@ -5,7 +5,9 @@ import com.clinicaserena.app.core.network.ApiResult
 import com.clinicaserena.app.core.time.ClinicTime
 import kotlinx.serialization.Serializable
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import java.time.OffsetDateTime
 
 /** `GET /pacientes/me/perfil` (`PatientProfileController`). La identidad sale de la sesión. */
@@ -18,9 +20,16 @@ data class PatientProfileResponse(
     val registeredAt: String,
 )
 
+/** `UpdatePatientProfileRequest` de Spring: solo `fullName` (2–160). */
+@Serializable
+data class UpdatePatientProfileRequest(val fullName: String)
+
 interface PatientProfileApi {
     @GET("pacientes/me/perfil")
     suspend fun getOwn(): Response<PatientProfileResponse>
+
+    @PATCH("pacientes/me/perfil")
+    suspend fun updateOwn(@Body body: UpdatePatientProfileRequest): Response<PatientProfileResponse>
 }
 
 data class PatientProfile(
@@ -32,6 +41,9 @@ data class PatientProfile(
 
 interface PatientProfileRepository {
     suspend fun getOwn(): ApiResult<PatientProfile>
+
+    /** Cambia el nombre completo. Spring valida 2–160 caracteres y devuelve el perfil actualizado. */
+    suspend fun updateName(fullName: String): ApiResult<PatientProfile>
 }
 
 class RemotePatientProfileRepository(
@@ -41,6 +53,12 @@ class RemotePatientProfileRepository(
 
     override suspend fun getOwn(): ApiResult<PatientProfile> =
         when (val result = apiCaller.call(authenticated = true) { api.getOwn() }) {
+            is ApiResult.Success -> ApiResult.Success(result.data.toDomain())
+            is ApiResult.Failure -> result
+        }
+
+    override suspend fun updateName(fullName: String): ApiResult<PatientProfile> =
+        when (val result = apiCaller.call(authenticated = true) { api.updateOwn(UpdatePatientProfileRequest(fullName)) }) {
             is ApiResult.Success -> ApiResult.Success(result.data.toDomain())
             is ApiResult.Failure -> result
         }

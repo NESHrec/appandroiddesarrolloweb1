@@ -72,6 +72,7 @@ class PatientProfileViewModelTest {
             calls++
             return results.removeFirst()
         }
+        override suspend fun updateName(fullName: String): ApiResult<PatientProfile> = error("no se usa")
     }
 
     private val profile = PatientProfile("Paciente Prueba", "paciente@ejemplo.invalid", "ACTIVA", null)
@@ -85,13 +86,13 @@ class PatientProfileViewModelTest {
             results += ApiResult.Success(profile)
         }
         val vm = PatientProfileViewModel(repo, f.manager)
-        assertTrue((vm.state.value as LoadState.Failed).failure is ApiResult.Unauthenticated)
+        assertTrue((vm.state.value.load as LoadState.Failed).failure is ApiResult.Unauthenticated)
 
         f.manager.expire()
         f.manager.login("paciente@ejemplo.invalid", "clave")
 
         assertEquals(2, repo.calls)
-        assertEquals(LoadState.Loaded(profile), vm.state.value)
+        assertEquals(LoadState.Loaded(profile), vm.state.value.load)
     }
 }
 
