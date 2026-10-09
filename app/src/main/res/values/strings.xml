@@ -118,7 +118,67 @@
 
     <!-- Secciones pendientes -->
     <string name="pendiente_titulo">Sección en preparación</string>
-    <string name="pendiente_mensaje">Esta sección se habilita en la %1$s. Todavía no muestra datos.</string>
-    <string name="fase_b">Fase B</string>
-    <string name="fase_c">Fase C</string>
+    <string name="pendiente_mensaje">Esta sección todavía no está disponible en la app y no muestra datos.</string>
+
+    <!-- Inicio del paciente -->
+    <string name="inicio_proxima_cita">Tu próxima cita</string>
+    <string name="inicio_sin_proxima_titulo">No tienes citas próximas</string>
+    <string name="inicio_sin_proxima_mensaje">Cuando reserves una cita, aparecerá aquí con su fecha y hora.</string>
+    <string name="reservar_cita">Reservar cita</string>
+    <string name="ver_mis_citas">Ver mis citas</string>
+
+    <!-- Citas -->
+    <string name="citas_proximas">Próximas</string>
+    <string name="citas_historial">Historial</string>
+    <string name="citas_vacio_proximas">No tienes citas próximas.</string>
+    <string name="citas_vacio_historial">Aún no tienes citas en tu historial.</string>
+    <string name="citas_vacio_filtro">No hay citas con este estado en esta pestaña.</string>
+    <string name="cita_filtro_todos">Todos</string>
+    <string name="cita_estado_pendiente">Pendiente</string>
+    <string name="cita_estado_confirmada">Confirmada</string>
+    <string name="cita_estado_completada">Completada</string>
+    <string name="cita_estado_cancelada">Cancelada</string>
+    <string name="cita_ver_detalle">ver detalle</string>
+    <string name="cita_detalle_titulo">Detalle de la cita</string>
+    <string name="cita_fecha_hora">Fecha y hora (Guatemala)</string>
+    <string name="cita_especialidad">Especialidad</string>
+    <string name="cita_medico">Médico</string>
+    <string name="cita_notas">Notas</string>
+    <string name="cita_sin_notas">Sin notas</string>
+    <string name="cita_monto">Monto</string>
+    <string name="cita_especialidad_desconocida">Especialidad no disponible</string>
+    <string name="cita_medico_desconocido">Médico no disponible</string>
+    <string name="cita_no_encontrada_titulo">No encontramos esta cita</string>
+    <string name="cita_no_encontrada_mensaje">Puede que ya no esté en tu lista. Vuelve a Citas para ver la información actualizada.</string>
+    <string name="cita_cambios_titulo">¿Necesitas cambiarla o cancelarla?</string>
+    <string name="cita_cambios_mensaje">Por ahora la app no permite cancelar ni reprogramar citas. Comunícate con la clínica.</string>
+
+    <!-- Reserva -->
+    <string name="reserva_paso_especialidad">Elige la especialidad</string>
+    <string name="reserva_paso_medico">Elige el médico</string>
+    <string name="reserva_paso_horario">Elige el horario</string>
+    <string name="reserva_paso_confirmar">Confirma tu cita</string>
+    <string name="reserva_paso_listo">Cita reservada</string>
+    <string name="reserva_sin_especialidades">No hay especialidades disponibles en este momento.</string>
+    <string name="reserva_sin_medicos">No hay médicos disponibles para esta especialidad.</string>
+    <string name="reserva_sin_horarios">Este médico no tiene horarios disponibles en los próximos 30 días.</string>
+    <string name="reserva_horarios_zona">Horarios en hora de Guatemala.</string>
+    <string name="reserva_horario_ocupado_titulo">Ese horario ya no está disponible</string>
+    <string name="reserva_horario_ocupado_mensaje">Alguien lo reservó o ya pasó. Actualizamos la lista: elige otro horario.</string>
+    <string name="reserva_duracion">Horario</string>
+    <string name="reserva_notas">Notas para la clínica (opcional)</string>
+    <string name="reserva_notas_contador">%1$d/%2$d caracteres</string>
+    <string name="reserva_notas_largas">Las notas no pueden tener más de 1000 caracteres.</string>
+    <string name="reserva_confirmar">Confirmar reserva</string>
+    <string name="reserva_esperando_sesion">Inicia sesión de nuevo y enviaremos tu reserva con los mismos datos.</string>
+    <string name="reserva_no_completada_titulo">No se pudo reservar</string>
+    <string name="reserva_datos_no_coinciden">Los datos de la reserva no coinciden (médico, especialidad u horario). Vuelve atrás y revisa tu selección.</string>
+    <string name="reserva_fecha_invalida">La fecha del horario no es válida. Vuelve atrás y elige el horario de nuevo.</string>
+    <string name="reserva_medico_no_disponible">El médico o la especialidad ya no están disponibles. Vuelve atrás y elige otra opción.</string>
+    <string name="reserva_error_generico">No se pudo crear la reserva. Revisa los datos e inténtalo de nuevo.</string>
+    <string name="reserva_no_confirmada">No pudimos confirmar la reserva y no aparece en tus citas. Revisa tu conexión e inténtalo de nuevo.</string>
+    <string name="reserva_incierta">No pudimos comprobar si la reserva se creó. Revisa tu conexión; antes de volver a enviarla revisaremos tus citas.</string>
+    <string name="reserva_exito_titulo">Cita reservada</string>
+    <string name="reserva_exito_mensaje">La clínica confirmó tu reserva. Puedes verla en Mis citas.</string>
+    <string name="reserva_volver_inicio">Volver</string>
 </resources>

@@ -16,6 +16,13 @@ object ClinicTime {
     private val locale: Locale = Locale.forLanguageTag("es-GT")
     private val dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM 'de' yyyy, HH:mm", locale)
     private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm", locale)
+    private val dayFormatter = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", locale)
+
+    /** Día en Guatemala, para agrupar horarios: "jueves 8 de octubre". */
+    fun formatDay(value: OffsetDateTime): String = value.atZoneSameInstant(ZONE).format(dayFormatter)
+
+    /** Fecha de calendario en Guatemala (para agrupar bloques por día). */
+    fun localDate(value: OffsetDateTime): java.time.LocalDate = value.atZoneSameInstant(ZONE).toLocalDate()
 
     /** Acepta `Z` y offsets explícitos (`-06:00`, `+00:00`). */
     fun parse(value: String): OffsetDateTime = OffsetDateTime.parse(value)

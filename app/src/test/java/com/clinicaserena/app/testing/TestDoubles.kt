@@ -98,3 +98,46 @@ class SessionFixture(scope: CoroutineScope) {
     val auth = FakeAuthRepository()
     val manager = SessionManager(store, { auth }, TEST_CLOCK, scope)
 }
+
+/** Catálogo configurable que cuenta las llamadas a disponibilidad. */
+class FakeCatalogRepository : com.clinicaserena.app.data.catalog.CatalogRepository {
+    var specialtiesResult: ApiResult<List<com.clinicaserena.app.domain.model.Specialty>> =
+        ApiResult.Success(listOf(com.clinicaserena.app.domain.model.Specialty("esp-1", "Odontología general", null)))
+    var practitionersResult: ApiResult<List<com.clinicaserena.app.domain.model.Practitioner>> =
+        ApiResult.Success(listOf(com.clinicaserena.app.domain.model.Practitioner("med-1", "Dra. Elena Morales", "esp-1", "Odontología general")))
+    var slotsResult: ApiResult<List<com.clinicaserena.app.domain.model.Slot>> = ApiResult.Success(emptyList())
+    var availabilityCalls = 0
+
+    override suspend fun specialties() = specialtiesResult
+    override suspend fun practitioners(specialtyId: String) = practitionersResult
+    override suspend fun allPractitioners() = practitionersResult
+    override suspend fun availability(practitionerId: String): ApiResult<List<com.clinicaserena.app.domain.model.Slot>> {
+        availabilityCalls++
+        return slotsResult
+    }
+}
+
+/** Repositorio de citas configurable que registra cada reserva enviada. */
+class FakeAppointmentsRepository : com.clinicaserena.app.data.patient.AppointmentsRepository {
+    data class Booking(val practitionerId: String, val specialtyId: String, val scheduledAtRaw: String, val notes: String?)
+
+    val bookResults = ArrayDeque<ApiResult<com.clinicaserena.app.domain.model.Appointment>>()
+    var listResult: ApiResult<List<com.clinicaserena.app.domain.model.Appointment>> = ApiResult.Success(emptyList())
+    val bookings = mutableListOf<Booking>()
+    var listCalls = 0
+
+    override suspend fun listOwn(): ApiResult<List<com.clinicaserena.app.domain.model.Appointment>> {
+        listCalls++
+        return listResult
+    }
+
+    override suspend fun book(
+        practitionerId: String,
+        specialtyId: String,
+        scheduledAtRaw: String,
+        notes: String?,
+    ): ApiResult<com.clinicaserena.app.domain.model.Appointment> {
+        bookings += Booking(practitionerId, specialtyId, scheduledAtRaw, notes)
+        return bookResults.removeFirst()
+    }
+}

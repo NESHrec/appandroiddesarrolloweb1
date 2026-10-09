@@ -27,8 +27,8 @@ private val doctorDestinations = listOf(
 fun DoctorNavHost() {
     val container = LocalAppContainer.current
     RoleNavScaffold(destinations = doctorDestinations, startDestination = DoctorHomeRoute) {
-        composable<DoctorHomeRoute> { PendingFeatureScreen(R.string.fase_c) }
-        composable<DoctorAgendaRoute> { PendingFeatureScreen(R.string.fase_c) }
+        composable<DoctorHomeRoute> { PendingFeatureScreen() }
+        composable<DoctorAgendaRoute> { PendingFeatureScreen() }
         composable<DoctorProfileRoute> {
             DoctorProfileScreen(
                 viewModel = viewModel { DoctorProfileViewModel(container.authRepository, container.sessionManager) },

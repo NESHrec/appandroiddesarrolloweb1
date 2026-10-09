@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -81,7 +82,15 @@ fun RoleNavScaffold(
                             }
                         },
                         icon = { Icon(painterResource(destination.iconRes), contentDescription = null) },
-                        label = { Text(stringResource(destination.labelRes)) },
+                        // Una sola línea: con fuente grande la etiqueta se recorta en lugar de partirse;
+                        // TalkBack sigue leyendo el texto completo.
+                        label = {
+                            Text(
+                                stringResource(destination.labelRes),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        },
                         alwaysShowLabel = true,
                         colors = NavigationBarItemDefaults.colors(
                             indicatorColor = MaterialTheme.colorScheme.primaryContainer,

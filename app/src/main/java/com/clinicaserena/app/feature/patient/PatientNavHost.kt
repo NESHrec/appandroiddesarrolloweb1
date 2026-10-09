@@ -8,13 +8,22 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.clinicaserena.app.R
 import com.clinicaserena.app.core.ui.LocalAppContainer
 import com.clinicaserena.app.feature.common.PendingFeatureScreen
 import com.clinicaserena.app.feature.common.RoleNavScaffold
 import com.clinicaserena.app.feature.common.TopLevelDestination
+import com.clinicaserena.app.feature.patient.appointments.AppointmentDetailScreen
+import com.clinicaserena.app.feature.patient.appointments.AppointmentListScreen
+import com.clinicaserena.app.feature.patient.appointments.AppointmentTab
+import com.clinicaserena.app.feature.patient.appointments.PatientAppointmentsViewModel
+import com.clinicaserena.app.feature.patient.appointments.PatientHomeScreen
+import com.clinicaserena.app.feature.patient.booking.BookingScreen
+import com.clinicaserena.app.feature.patient.booking.BookingViewModel
 import com.clinicaserena.app.feature.patient.profile.PatientProfileScreen
 import com.clinicaserena.app.feature.patient.profile.PatientProfileViewModel
 import kotlinx.serialization.Serializable
@@ -24,6 +33,8 @@ import kotlinx.serialization.Serializable
 @Serializable data object PatientRecordRoute
 @Serializable data object PatientPrescriptionsRoute
 @Serializable data object PatientProfileRoute
+@Serializable data class AppointmentDetailRoute(val appointmentId: String)
+@Serializable data object BookingRoute
 
 private val patientDestinations = listOf(
     TopLevelDestination(PatientHomeRoute, R.string.nav_inicio, R.drawable.ic_home),
@@ -32,11 +43,20 @@ private val patientDestinations = listOf(
     TopLevelDestination(PatientPrescriptionsRoute, R.string.nav_recetas, R.drawable.ic_receipt),
 )
 
-/** Navegación del PACIENTE: Inicio, Citas, Mi expediente y Recetas (contenido en B2/B3), más Mi perfil. */
+/** Navegación del PACIENTE: Inicio, Citas (lista, detalle y reserva), Mi expediente, Recetas y Mi perfil. */
 @Composable
 fun PatientNavHost() {
     val container = LocalAppContainer.current
     val navController = rememberNavController()
+    // Compartido por Inicio, la lista y el detalle; vive en el almacén de la sesión.
+    val appointments = viewModel {
+        PatientAppointmentsViewModel(
+            container.appointmentsRepository,
+            container.catalogRepository,
+            container.sessionManager,
+            container.clock,
+        )
+    }
 
     RoleNavScaffold(
         destinations = patientDestinations,
@@ -51,10 +71,45 @@ fun PatientNavHost() {
             }
         },
     ) {
-        composable<PatientHomeRoute> { PendingFeatureScreen(R.string.fase_b) }
-        composable<PatientAppointmentsRoute> { PendingFeatureScreen(R.string.fase_b) }
-        composable<PatientRecordRoute> { PendingFeatureScreen(R.string.fase_b) }
-        composable<PatientPrescriptionsRoute> { PendingFeatureScreen(R.string.fase_b) }
+        composable<PatientHomeRoute> {
+            PatientHomeScreen(
+                viewModel = appointments,
+                onOpenAppointment = { navController.navigate(AppointmentDetailRoute(it)) },
+                onBook = { navController.navigate(BookingRoute) },
+                onSeeAll = { navController.navigateToTab(PatientAppointmentsRoute) },
+            )
+        }
+        composable<PatientAppointmentsRoute> {
+            AppointmentListScreen(
+                viewModel = appointments,
+                onOpenAppointment = { navController.navigate(AppointmentDetailRoute(it)) },
+                onBook = { navController.navigate(BookingRoute) },
+            )
+        }
+        composable<AppointmentDetailRoute> { entry ->
+            AppointmentDetailScreen(
+                viewModel = appointments,
+                appointmentId = entry.toRoute<AppointmentDetailRoute>().appointmentId,
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable<BookingRoute> {
+            BookingScreen(
+                viewModel = viewModel {
+                    BookingViewModel(container.catalogRepository, container.appointmentsRepository, container.sessionManager)
+                },
+                onExit = { navController.popBackStack() },
+                onBooked = appointments::load,
+                onViewAppointments = {
+                    // La cita recién reservada es futura: se muestra la pestaña Próximas.
+                    appointments.selectTab(AppointmentTab.UPCOMING)
+                    navController.popBackStack()
+                    navController.navigateToTab(PatientAppointmentsRoute)
+                },
+            )
+        }
+        composable<PatientRecordRoute> { PendingFeatureScreen() }
+        composable<PatientPrescriptionsRoute> { PendingFeatureScreen() }
         composable<PatientProfileRoute> {
             PatientProfileScreen(
                 viewModel = viewModel {
@@ -63,5 +118,13 @@ fun PatientNavHost() {
                 onBack = { navController.popBackStack() },
             )
         }
+    }
+}
+
+private fun NavHostController.navigateToTab(route: Any) {
+    navigate(route) {
+        popUpTo(PatientHomeRoute) { saveState = true }
+        launchSingleTop = true
+        restoreState = true
     }
 }

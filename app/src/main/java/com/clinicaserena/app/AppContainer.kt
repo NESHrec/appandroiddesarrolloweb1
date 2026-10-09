@@ -13,7 +13,13 @@ import com.clinicaserena.app.core.security.SessionStore
 import com.clinicaserena.app.data.auth.AuthApi
 import com.clinicaserena.app.data.auth.AuthRepository
 import com.clinicaserena.app.data.auth.RemoteAuthRepository
+import com.clinicaserena.app.data.catalog.CatalogApi
+import com.clinicaserena.app.data.catalog.CatalogRepository
+import com.clinicaserena.app.data.catalog.RemoteCatalogRepository
 import com.clinicaserena.app.data.health.HealthApi
+import com.clinicaserena.app.data.patient.AppointmentsApi
+import com.clinicaserena.app.data.patient.AppointmentsRepository
+import com.clinicaserena.app.data.patient.RemoteAppointmentsRepository
 import com.clinicaserena.app.data.health.HealthRepository
 import com.clinicaserena.app.data.patient.PatientProfileApi
 import com.clinicaserena.app.data.patient.PatientProfileRepository
@@ -44,7 +50,7 @@ class AppContainer(context: Context) {
         SessionManager(
             store = sessionStore,
             authRepository = { authRepository },
-            clock = Clock.systemUTC(),
+            clock = clock,
             scope = appScope,
         )
     }
@@ -69,6 +75,16 @@ class AppContainer(context: Context) {
 
     val healthRepository: HealthRepository by lazy {
         HealthRepository(retrofit.create(HealthApi::class.java), apiCaller)
+    }
+
+    val clock: Clock = Clock.systemUTC()
+
+    val catalogRepository: CatalogRepository by lazy {
+        RemoteCatalogRepository(retrofit.create(CatalogApi::class.java), apiCaller)
+    }
+
+    val appointmentsRepository: AppointmentsRepository by lazy {
+        RemoteAppointmentsRepository(retrofit.create(AppointmentsApi::class.java), apiCaller)
     }
 
     val patientProfileRepository: PatientProfileRepository by lazy {
