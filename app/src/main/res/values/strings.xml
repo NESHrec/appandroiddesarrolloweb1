@@ -226,4 +226,43 @@
     <string name="perfil_nombre_corto">El nombre debe tener al menos 2 caracteres.</string>
     <string name="perfil_nombre_actualizado">Tu nombre se actualizó.</string>
     <string name="perfil_esperando_sesion">Inicia sesión de nuevo y guardaremos el nombre que escribiste.</string>
+
+    <!-- Médico: inicio y agenda -->
+    <string name="medico_filtro_hoy">Hoy</string>
+    <string name="medico_filtro_semana">Esta semana</string>
+    <string name="medico_filtro_mes">Este mes</string>
+    <string name="medico_filtro_proximos_7">Próximos 7 días</string>
+    <string name="medico_filtro_ultimos_7">Últimos 7 días</string>
+    <string name="medico_filtro_proximos_30">Próximos 30 días</string>
+    <string name="medico_periodo_hoy">hoy</string>
+    <string name="medico_periodo_semana">esta semana (lunes a domingo)</string>
+    <string name="medico_periodo_mes">este mes</string>
+    <string name="medico_pacientes_distintos">Pacientes distintos con cita en %1$s (sin contar canceladas)</string>
+    <string name="medico_citas_en_periodo">Calculado sobre %1$d citas del período.</string>
+    <string name="medico_resultado_incompleto_titulo">El resultado puede estar incompleto</string>
+    <string name="medico_resultado_incompleto_mensaje">Llegaron 100 citas, el máximo que entrega el servidor. Puede haber más: elige un período o rango más corto.</string>
+    <string name="medico_listas_para_documentar">Listas para documentar</string>
+    <string name="medico_sin_listas">No hay citas listas para documentar en este período.</string>
+    <string name="medico_proximas_citas">Próximas citas</string>
+    <string name="medico_sin_proximas">No hay más citas en este período.</string>
+    <string name="medico_agenda_vacia">No tienes citas en este rango con el filtro elegido.</string>
+    <string name="medico_lista_para_documentar">Lista para documentar</string>
+    <string name="medico_llegada">Llegada</string>
+    <string name="medico_llegada_registrada">Llegó a las %1$s</string>
+    <string name="medico_llegada_sin_registrar">Llegada sin registrar</string>
+    <string name="medico_paciente">Paciente</string>
+    <string name="medico_paciente_sin_nombre">Paciente sin nombre registrado</string>
+    <string name="medico_cita_titulo">Cita</string>
+    <string name="medico_cita_no_encontrada">No encontramos esta cita en tu agenda.</string>
+    <string name="medico_no_documentable_titulo">Todavía no se puede registrar la atención</string>
+    <string name="medico_aviso_odontograma_antes">Si necesitas registrar observaciones del odontograma, hazlo antes de registrar la atención.</string>
+    <string name="medico_registrar_atencion">Registrar atención</string>
+    <string name="medico_ver_expediente">Ver expediente</string>
+    <string name="medico_ver_odontograma">Odontograma</string>
+    <string name="medico_atencion_registrada">Atención registrada</string>
+    <string name="bloqueo_atencion_registrada">La cita ya tiene una atención registrada. Para corregirla, agrega una adenda.</string>
+    <string name="bloqueo_estado_no_documentable">La cita está cancelada o completada; no admite una atención nueva.</string>
+    <string name="bloqueo_no_iniciada">La cita aún no comienza. Podrás documentarla a partir de su hora programada.</string>
+    <string name="bloqueo_sin_llegada">Recepción debe registrar la llegada del paciente antes de documentar.</string>
+    <string name="bloqueo_desconocido">No se puede documentar por ahora (motivo: %1$s).</string>
 </resources>

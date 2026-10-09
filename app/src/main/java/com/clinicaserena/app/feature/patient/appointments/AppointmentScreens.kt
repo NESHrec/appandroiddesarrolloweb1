@@ -42,6 +42,7 @@ import com.clinicaserena.app.core.ui.theme.LocalStatusColors
 import com.clinicaserena.app.domain.model.AppointmentStatus
 import com.clinicaserena.app.feature.common.BackScaffold
 import com.clinicaserena.app.feature.common.InfoRow
+import com.clinicaserena.app.feature.common.StatusChip
 import java.util.Locale
 
 // ---------------------------------------------------------------- Inicio

@@ -16,6 +16,9 @@ import com.clinicaserena.app.data.auth.RemoteAuthRepository
 import com.clinicaserena.app.data.catalog.CatalogApi
 import com.clinicaserena.app.data.catalog.CatalogRepository
 import com.clinicaserena.app.data.catalog.RemoteCatalogRepository
+import com.clinicaserena.app.data.doctor.DoctorApi
+import com.clinicaserena.app.data.doctor.DoctorRepository
+import com.clinicaserena.app.data.doctor.RemoteDoctorRepository
 import com.clinicaserena.app.data.health.HealthApi
 import com.clinicaserena.app.data.patient.AppointmentsApi
 import com.clinicaserena.app.data.patient.AppointmentsRepository
@@ -88,6 +91,10 @@ class AppContainer(context: Context) {
 
     val appointmentsRepository: AppointmentsRepository by lazy {
         RemoteAppointmentsRepository(retrofit.create(AppointmentsApi::class.java), apiCaller)
+    }
+
+    val doctorRepository: DoctorRepository by lazy {
+        RemoteDoctorRepository(retrofit.create(DoctorApi::class.java), apiCaller)
     }
 
     val patientClinicalRepository: PatientClinicalRepository by lazy {

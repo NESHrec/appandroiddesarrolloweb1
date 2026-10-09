@@ -46,12 +46,21 @@
 - Verificado en vivo: Spring devuelve las fechas en UTC con Z (ej. 2026-10-07T06:11:00Z) y acepta scheduledAt en Z.
 - Verificado en vivo (A2): ruta inexistente con sesión → 403 FORBIDDEN si queda fuera de los prefijos permitidos al rol (paciente → /ruta-que-no-existe), pero 404 RESOURCE_NOT_FOUND si queda dentro de uno permitido (médico → /medico/ruta-que-no-existe); sin sesión → 401 UNAUTHENTICATED. Un bloque libre deja de aparecer en disponibilidad en cuanto inicia (para probar reservas se necesitan bloques futuros creados por el médico).
 - Verificado en vivo (B1): tras 5 fallos de login con el mismo correo, incluso la contraseña correcta recibe 401 AUTHENTICATION_FAILED (idéntico a credenciales incorrectas) durante 60 s; después vuelve a entrar (200). Un paciente sin verificar recibe el mismo 401. La app muestra un único mensaje que cubre los tres casos.
-- Según el código del backend, pendiente de verificar en vivo: cita de otro médico → 404 (no 403), en la Fase C con dos médicos.
-- Cuentas de prueba: además de paciente, ADMIN, médico y recepción, existe Paciente 2 (registrado desde la app en B1, sin citas).
+- Verificado en vivo (C1, con dos médicos): todo recurso de otro médico → 404, nunca 403. Cita, expediente, atención, perfil clínico y adenda ajenos → 404 APPOINTMENT_NOT_FOUND; odontograma de un paciente sin citas con ese médico (GET) o sobre una cita ajena (POST) → 404 PATIENT_NOT_FOUND. Ninguna de esas peticiones deja efectos. Cada médico solo ve sus citas en /medico/citas. Un médico sin vincular recibe 403 PRACTITIONER_LINK_REQUIRED en /medico/**.
+- Cuentas de prueba: además de paciente, ADMIN, médico y recepción, existen Paciente 2 (registrado desde la app en B1) y Médico 2 (vinculado a Dr. Mateo Rivera, Ortodoncia; tiene una cita de Paciente 2 el 10/10 a las 11:00).
 
 ## Git
 - No hacer commit ni push sin que yo lo pida.
 - No subir APK, secretos, `.env` ni informes locales.
+
+## Acciones prohibidas sin pedirme permiso
+- git commit, git push, git reset, git rebase o cualquier cambio de historial.
+- Borrar volúmenes o contenedores de Docker (docker rm, docker volume rm, docker compose down -v) o detener contenedores de otros proyectos.
+- Detener o modificar el PostgreSQL 17 de mi Mac (brew services, launchctl, kill).
+- rm -rf o borrar archivos fuera del repo de la app y de ~/Desktop/clinica-serena-local/.
+- Modificar archivos del repo del backend o mi ~/.zshrc.
+- Instalar o desinstalar software del sistema (brew install, sdkmanager --uninstall).
+- git checkout, git restore o git stash sobre archivos con cambios sin commit (pueden descartar trabajo); explícame primero qué se perdería.
 
 ## Informe al terminar cada tarea
 Al finalizar cada tarea o fase, entrega en la conversación (como texto, sin crear archivos) un informe con:

@@ -199,21 +199,22 @@ internal fun ClinicalRecordResponse.toDomain() = ClinicalRecord(
     recordId = recordId,
     profile = clinicalProfile?.toDomain(),
     profileHistory = clinicalProfileHistory.map { it.toDomain() }.sortedByDescending { it.recordedAt.toInstant() },
-    attentions = attentions.map { attention ->
-        Attention(
-            id = attention.id,
-            appointmentScheduledAt = attention.appointmentScheduledAt.toDateOrNull(),
-            practitionerName = attention.practitionerName,
-            authorName = attention.authorName,
-            reason = attention.reason,
-            findings = attention.findings,
-            diagnosis = attention.diagnosis,
-            treatmentPlan = attention.treatmentPlan,
-            recordedAt = ClinicTime.parse(attention.recordedAt),
-            prescription = attention.prescription.toItems(),
-            addenda = attention.addenda
-                .map { Addendum(it.text, it.reason, it.authorName, ClinicTime.parse(it.recordedAt)) }
-                .sortedBy { it.recordedAt.toInstant() },
-        )
-    }.sortedByDescending { it.recordedAt.toInstant() },
+    attentions = attentions.map { it.toDomain() }.sortedByDescending { it.recordedAt.toInstant() },
+)
+
+/** Atención de Spring (`AttentionResponse`); la usan el expediente y el detalle de cita del médico. */
+internal fun AttentionResponse.toDomain() = Attention(
+    id = id,
+    appointmentScheduledAt = appointmentScheduledAt.toDateOrNull(),
+    practitionerName = practitionerName,
+    authorName = authorName,
+    reason = reason,
+    findings = findings,
+    diagnosis = diagnosis,
+    treatmentPlan = treatmentPlan,
+    recordedAt = ClinicTime.parse(recordedAt),
+    prescription = prescription.toItems(),
+    addenda = addenda
+        .map { Addendum(it.text, it.reason, it.authorName, ClinicTime.parse(it.recordedAt)) }
+        .sortedBy { it.recordedAt.toInstant() },
 )

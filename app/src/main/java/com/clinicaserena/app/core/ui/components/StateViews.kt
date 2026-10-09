@@ -110,13 +110,20 @@ fun SessionExpiredState(onLogin: () -> Unit, modifier: Modifier = Modifier, scro
 }
 
 @Composable
-fun ForbiddenState(message: String, modifier: Modifier = Modifier, scrollable: Boolean = true) {
+fun ForbiddenState(
+    message: String,
+    modifier: Modifier = Modifier,
+    scrollable: Boolean = true,
+    onRetry: (() -> Unit)? = null,
+) {
     StatusPanel(
         iconRes = R.drawable.ic_lock,
         title = stringResource(R.string.estado_permiso_denegado_titulo),
         message = message,
         background = LocalStatusColors.current.error,
         modifier = modifier,
+        actionLabel = onRetry?.let { stringResource(R.string.estado_reintentar) },
+        onAction = onRetry,
         scrollable = scrollable,
     )
 }
