@@ -67,10 +67,11 @@ data class Attention(
     val addenda: List<Addendum>,
 )
 
-/** Expediente propio. [recordId] es `null` hasta la primera atención. */
+/** Expediente (propio o de un paciente de la cita). [recordId] es `null` hasta la primera atención. */
 data class ClinicalRecord(
     val recordId: String?,
     val profile: ClinicalProfile?,
     val profileHistory: List<ClinicalProfile>,
     val attentions: List<Attention>,
+    val patientName: String? = null,
 )

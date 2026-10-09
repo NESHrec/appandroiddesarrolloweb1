@@ -265,4 +265,59 @@
     <string name="bloqueo_no_iniciada">La cita aún no comienza. Podrás documentarla a partir de su hora programada.</string>
     <string name="bloqueo_sin_llegada">Recepción debe registrar la llegada del paciente antes de documentar.</string>
     <string name="bloqueo_desconocido">No se puede documentar por ahora (motivo: %1$s).</string>
+
+    <!-- Médico: registro de atención -->
+    <string name="atencion_hallazgos_opcional">Hallazgos (opcional)</string>
+    <string name="atencion_plan_opcional">Plan de tratamiento (opcional)</string>
+    <string name="atencion_receta_titulo">Receta (%1$d de %2$d medicamentos)</string>
+    <string name="atencion_sin_receta">Sin medicamentos. Puedes registrar la atención sin receta.</string>
+    <string name="atencion_item_numero">Medicamento %1$d</string>
+    <string name="atencion_item_medicamento">Medicamento</string>
+    <string name="atencion_item_dosis">Dosis</string>
+    <string name="atencion_item_frecuencia">Frecuencia</string>
+    <string name="atencion_item_duracion">Duración</string>
+    <string name="atencion_item_indicaciones">Indicaciones (opcional)</string>
+    <string name="atencion_quitar_item">Quitar medicamento</string>
+    <string name="atencion_agregar_item">Agregar medicamento</string>
+    <string name="atencion_revisar">Revisar antes de guardar</string>
+    <string name="atencion_confirmar_titulo">Confirma la atención</string>
+    <string name="atencion_resumen">Resumen</string>
+    <string name="atencion_inmutable_titulo">No se puede editar ni borrar</string>
+    <string name="atencion_inmutable_mensaje">La atención no se puede editar ni borrar después de registrarla. Las correcciones se hacen con adendas.</string>
+    <string name="atencion_odontograma_titulo">Odontograma</string>
+    <string name="atencion_aviso_odontograma_despues">Después de registrar la atención ya no podrás agregar observaciones al odontograma de esta cita.</string>
+    <string name="atencion_confirmar">Confirmar y registrar</string>
+    <string name="atencion_volver_a_editar">Volver a editar</string>
+    <string name="atencion_esperando_sesion">Inicia sesión de nuevo y enviaremos lo que escribiste, una sola vez.</string>
+    <string name="atencion_registrada_titulo">Atención registrada</string>
+    <string name="atencion_registrada_mensaje">Spring confirmó el registro. La cita quedó completada.</string>
+    <string name="atencion_volver_a_la_cita">Volver a la cita</string>
+    <string name="atencion_ver_existente">Ver la atención registrada</string>
+    <string name="atencion_no_registrada_titulo">No se registró</string>
+    <string name="atencion_409_ya_registrada">Esta cita ya tiene una atención registrada (quizá desde otro dispositivo). No se registró una nueva.</string>
+    <string name="atencion_409_no_documentable">La cita está cancelada o completada y ya no admite una atención.</string>
+    <string name="atencion_409_no_iniciada">La cita aún no comienza; podrás registrar la atención a partir de su hora.</string>
+    <string name="atencion_409_sin_llegada">Recepción aún no registra la llegada del paciente; no se puede documentar todavía.</string>
+    <string name="atencion_409_sin_paciente">La cita no está asociada a un paciente registrado; no se puede documentar.</string>
+    <string name="atencion_409_generico">La cita no admite registrar la atención en este momento.</string>
+    <string name="atencion_no_registrada_reintentar">No pudimos confirmar el envío y la atención no aparece en la cita. Revisa tu conexión e inténtalo de nuevo.</string>
+    <string name="atencion_incierta">No pudimos comprobar si la atención se registró. Revisa tu conexión; antes de reenviarla comprobaremos la cita.</string>
+    <string name="atencion_validacion_motivo">El motivo debe tener entre 3 y 1000 caracteres.</string>
+    <string name="atencion_validacion_diagnostico">El diagnóstico debe tener entre 3 y 1000 caracteres.</string>
+    <string name="atencion_validacion_2000">Máximo 2000 caracteres.</string>
+    <string name="atencion_validacion_medicamento">El medicamento debe tener entre 2 y 160 caracteres.</string>
+    <string name="atencion_validacion_80">Obligatorio, máximo 80 caracteres.</string>
+    <string name="atencion_validacion_500">Máximo 500 caracteres.</string>
+
+    <!-- Médico: perfil clínico -->
+    <string name="perfil_clinico_titulo">Nueva versión del perfil clínico</string>
+    <string name="perfil_clinico_nueva_version">Nueva versión del perfil clínico</string>
+    <string name="perfil_clinico_explicacion">Completa al menos un dato. Se guarda como una versión nueva; las anteriores quedan en el historial.</string>
+    <string name="perfil_clinico_inmutable">Esta versión no se podrá editar ni borrar. Para cambiarla, registra una versión nueva.</string>
+    <string name="perfil_clinico_confirmar">Confirmar y guardar versión</string>
+    <string name="perfil_clinico_vacio">Indica al menos un dato clínico.</string>
+    <string name="perfil_clinico_guardado">Spring guardó la nueva versión del perfil clínico.</string>
+    <string name="perfil_clinico_volver">Volver al expediente</string>
+    <string name="perfil_clinico_no_guardado">No pudimos confirmar el envío y la versión no aparece en el expediente. Inténtalo de nuevo.</string>
+    <string name="perfil_clinico_incierto">No pudimos comprobar si la versión se guardó. Revisa tu conexión; antes de reenviarla comprobaremos el expediente.</string>
 </resources>

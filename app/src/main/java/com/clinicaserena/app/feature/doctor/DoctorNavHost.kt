@@ -1,6 +1,10 @@
 package com.clinicaserena.app.feature.doctor
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.res.stringResource
@@ -16,6 +20,12 @@ import com.clinicaserena.app.feature.common.PendingFeatureScreen
 import com.clinicaserena.app.feature.common.RoleNavScaffold
 import com.clinicaserena.app.feature.common.TopLevelDestination
 import com.clinicaserena.app.feature.doctor.agenda.DoctorAgendaScreen
+import com.clinicaserena.app.feature.doctor.care.AttentionFormScreen
+import com.clinicaserena.app.feature.doctor.care.AttentionFormViewModel
+import com.clinicaserena.app.feature.doctor.care.ClinicalProfileFormScreen
+import com.clinicaserena.app.feature.doctor.care.ClinicalProfileFormViewModel
+import com.clinicaserena.app.feature.doctor.care.DoctorRecordScreen
+import com.clinicaserena.app.feature.doctor.care.DoctorRecordViewModel
 import com.clinicaserena.app.feature.doctor.agenda.DoctorAgendaViewModel
 import com.clinicaserena.app.feature.doctor.agenda.DoctorAppointmentDetailScreen
 import com.clinicaserena.app.feature.doctor.agenda.DoctorAppointmentViewModel
@@ -32,6 +42,7 @@ import kotlinx.serialization.Serializable
 @Serializable data class AttentionFormRoute(val appointmentId: String)
 @Serializable data class DoctorRecordRoute(val appointmentId: String)
 @Serializable data class OdontogramRoute(val appointmentId: String, val patientId: String)
+@Serializable data class ClinicalProfileFormRoute(val appointmentId: String)
 
 private val doctorDestinations = listOf(
     TopLevelDestination(DoctorHomeRoute, R.string.nav_inicio, R.drawable.ic_home),
@@ -67,6 +78,7 @@ fun DoctorNavHost() {
         composable<DoctorAppointmentRoute> { entry ->
             val appointmentId = entry.toRoute<DoctorAppointmentRoute>().appointmentId
             val viewModel = viewModel { DoctorAppointmentViewModel(container.doctorRepository, container.sessionManager, appointmentId) }
+            RefreshWhenFlagged(entry) { viewModel.load() }
             DoctorAppointmentDetailScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
@@ -79,10 +91,53 @@ fun DoctorNavHost() {
                 },
             )
         }
-        // Registro de atención, expediente y odontograma se implementan en C2 y C3.
-        composable<AttentionFormRoute> { PendingSecondary(R.string.medico_registrar_atencion) { navController.popBackStack() } }
-        composable<DoctorRecordRoute> { PendingSecondary(R.string.medico_ver_expediente) { navController.popBackStack() } }
+        composable<AttentionFormRoute> { entry ->
+            val appointmentId = entry.toRoute<AttentionFormRoute>().appointmentId
+            AttentionFormScreen(
+                viewModel = viewModel { AttentionFormViewModel(container.doctorRepository, container.sessionManager, appointmentId) },
+                onExit = { navController.popBackStack() },
+                onDone = {
+                    navController.previousBackStackEntry?.savedStateHandle?.set(REFRESH_KEY, true)
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable<DoctorRecordRoute> { entry ->
+            val appointmentId = entry.toRoute<DoctorRecordRoute>().appointmentId
+            val viewModel = viewModel { DoctorRecordViewModel(container.doctorRepository, container.sessionManager, appointmentId) }
+            RefreshWhenFlagged(entry) { viewModel.load() }
+            DoctorRecordScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onNewProfile = { navController.navigate(ClinicalProfileFormRoute(appointmentId)) },
+            )
+        }
+        composable<ClinicalProfileFormRoute> { entry ->
+            val appointmentId = entry.toRoute<ClinicalProfileFormRoute>().appointmentId
+            ClinicalProfileFormScreen(
+                viewModel = viewModel { ClinicalProfileFormViewModel(container.doctorRepository, container.sessionManager, appointmentId) },
+                onExit = {
+                    navController.previousBackStackEntry?.savedStateHandle?.set(REFRESH_KEY, true)
+                    navController.popBackStack()
+                },
+            )
+        }
+        // El odontograma se implementa en C3.
         composable<OdontogramRoute> { PendingSecondary(R.string.medico_ver_odontograma) { navController.popBackStack() } }
+    }
+}
+
+private const val REFRESH_KEY = "refresh"
+
+/** Recarga una pantalla cuando la siguiente avisa que guardó algo (atención o perfil clínico). */
+@Composable
+private fun RefreshWhenFlagged(entry: NavBackStackEntry, reload: () -> Unit) {
+    val flagged by entry.savedStateHandle.getStateFlow(REFRESH_KEY, false).collectAsStateWithLifecycle()
+    LaunchedEffect(flagged) {
+        if (flagged) {
+            entry.savedStateHandle[REFRESH_KEY] = false
+            reload()
+        }
     }
 }
 

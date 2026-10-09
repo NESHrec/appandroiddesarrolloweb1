@@ -48,8 +48,9 @@ import com.clinicaserena.app.feature.common.StatusChip
 @Composable
 fun DoctorHomeScreen(viewModel: DoctorHomeViewModel, onOpenAppointment: (String) -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    // Al volver a la pestaña, una carga fallida (p. ej. vinculación pendiente) se reintenta.
-    LaunchedEffect(Unit) { if (state.load is LoadState.Failed) viewModel.load() }
+    // Al volver a la pestaña se recarga (la primera carga la hace el ViewModel): refleja atenciones
+    // recién registradas y reintenta cargas fallidas, como la vinculación pendiente.
+    LaunchedEffect(Unit) { if (state.load !is LoadState.Loading) viewModel.load() }
     val periodLabel = stringResource(
         when (state.period) {
             HomePeriod.TODAY -> R.string.medico_periodo_hoy
@@ -140,8 +141,9 @@ fun DoctorHomeScreen(viewModel: DoctorHomeViewModel, onOpenAppointment: (String)
 @Composable
 fun DoctorAgendaScreen(viewModel: DoctorAgendaViewModel, onOpenAppointment: (String) -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    // Al volver a la pestaña, una carga fallida (p. ej. vinculación pendiente) se reintenta.
-    LaunchedEffect(Unit) { if (state.load is LoadState.Failed) viewModel.load() }
+    // Al volver a la pestaña se recarga (la primera carga la hace el ViewModel): refleja atenciones
+    // recién registradas y reintenta cargas fallidas, como la vinculación pendiente.
+    LaunchedEffect(Unit) { if (state.load !is LoadState.Loading) viewModel.load() }
 
     LazyColumn(
         contentPadding = PaddingValues(16.dp),

@@ -224,6 +224,15 @@ class DoctorAgendaViewModelsTest {
             return agendaResult
         }
         override suspend fun appointment(appointmentId: String) = detailResult
+        override suspend fun record(appointmentId: String): ApiResult<com.clinicaserena.app.domain.model.ClinicalRecord> = error("no se usa")
+        override suspend fun recordAttention(
+            appointmentId: String,
+            request: com.clinicaserena.app.data.doctor.RecordAttentionRequest,
+        ): ApiResult<com.clinicaserena.app.domain.model.Attention> = error("no se usa")
+        override suspend fun addClinicalProfile(
+            appointmentId: String,
+            request: com.clinicaserena.app.data.doctor.ClinicalProfileRequest,
+        ): ApiResult<com.clinicaserena.app.domain.model.ClinicalProfile> = error("no se usa")
     }
 
     @Test

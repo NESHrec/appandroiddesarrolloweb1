@@ -186,7 +186,7 @@ internal fun CheckupResponse.toDomain() = Checkup(
     prescription = prescription.toItems(),
 )
 
-private fun ClinicalProfileResponse.toDomain() = ClinicalProfile(
+internal fun ClinicalProfileResponse.toDomain() = ClinicalProfile(
     allergies = allergies,
     relevantConditions = relevantConditions,
     currentMedications = currentMedications,
@@ -200,6 +200,7 @@ internal fun ClinicalRecordResponse.toDomain() = ClinicalRecord(
     profile = clinicalProfile?.toDomain(),
     profileHistory = clinicalProfileHistory.map { it.toDomain() }.sortedByDescending { it.recordedAt.toInstant() },
     attentions = attentions.map { it.toDomain() }.sortedByDescending { it.recordedAt.toInstant() },
+    patientName = patient.fullName,
 )
 
 /** Atención de Spring (`AttentionResponse`); la usan el expediente y el detalle de cita del médico. */

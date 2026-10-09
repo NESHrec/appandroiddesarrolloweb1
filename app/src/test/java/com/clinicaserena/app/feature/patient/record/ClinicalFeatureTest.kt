@@ -69,7 +69,7 @@ class PatientClinicalRepositoryTest {
         val record = (repo.record() as ApiResult.Success).data
 
         assertEquals("/api/v1/pacientes/me/expediente", rig.server.takeRequest().url.encodedPath)
-        assertEquals(ClinicalRecord(null, null, emptyList(), emptyList()), record)
+        assertEquals(ClinicalRecord(null, null, emptyList(), emptyList(), patientName = "Ana"), record)
     }
 
     @Test
