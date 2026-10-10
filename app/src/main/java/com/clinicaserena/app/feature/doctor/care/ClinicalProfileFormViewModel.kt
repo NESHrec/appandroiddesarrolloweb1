@@ -32,7 +32,11 @@ data class ClinicalProfileFormUiState(
     val error: UserMessage? = null,
     val saved: ClinicalProfile? = null,
     val awaitingReauth: Boolean = false,
+    val confirmDiscard: Boolean = false,
 ) {
+    val hasChanges: Boolean
+        get() = listOf(allergies, relevantConditions, currentMedications, dentalHistory).any { it.isNotBlank() }
+
     override fun toString(): String = "ClinicalProfileFormUiState(step=$step, submitting=$submitting)"
 }
 
@@ -96,6 +100,21 @@ class ClinicalProfileFormViewModel(
     fun backToForm() {
         if (_state.value.submitting) return
         _state.update { it.copy(step = FormStep.FORM, error = null) }
+    }
+
+    fun onBack(): FormBack {
+        val current = _state.value
+        val action = formBack(current.step, current.hasChanges)
+        if (current.step == FormStep.CONFIRM) backToForm()
+        if (current.step == FormStep.FORM && action == FormBack.STAY) _state.update { it.copy(confirmDiscard = true) }
+        return action
+    }
+
+    fun keepEditing() = _state.update { it.copy(confirmDiscard = false) }
+
+    fun discardDraft() {
+        uncertainAttempt = false
+        _state.value = ClinicalProfileFormUiState()
     }
 
     fun submit() {

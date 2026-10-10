@@ -53,6 +53,11 @@ fun DoctorFailureContent(failure: ApiResult.Failure, onRetry: () -> Unit, scroll
             scrollable = scrollable,
             modifier = Modifier.testTag("doctor_appointment_not_found"),
         )
+        failure is ApiResult.NotFound && failure.code == "PATIENT_NOT_FOUND" -> ForbiddenState(
+            message = stringResource(R.string.odontograma_paciente_no_encontrado),
+            scrollable = scrollable,
+            modifier = Modifier.testTag("doctor_patient_not_found"),
+        )
         else -> FailureContent(failure, onRetry = onRetry, scrollable = scrollable)
     }
 }

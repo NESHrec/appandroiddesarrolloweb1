@@ -117,8 +117,6 @@
     <string name="nav_perfil">Perfil</string>
 
     <!-- Secciones pendientes -->
-    <string name="pendiente_titulo">Sección en preparación</string>
-    <string name="pendiente_mensaje">Esta sección todavía no está disponible en la app y no muestra datos.</string>
 
     <!-- Inicio del paciente -->
     <string name="inicio_proxima_cita">Tu próxima cita</string>
@@ -320,4 +318,74 @@
     <string name="perfil_clinico_volver">Volver al expediente</string>
     <string name="perfil_clinico_no_guardado">No pudimos confirmar el envío y la versión no aparece en el expediente. Inténtalo de nuevo.</string>
     <string name="perfil_clinico_incierto">No pudimos comprobar si la versión se guardó. Revisa tu conexión; antes de reenviarla comprobaremos el expediente.</string>
+
+    <!-- Formularios inmutables: descartar borrador -->
+    <string name="borrador_descartar_titulo">¿Descartar borrador?</string>
+    <string name="borrador_descartar_mensaje">Lo que escribiste no se ha guardado en Spring ni en el teléfono. Si sales, se perderá.</string>
+    <string name="borrador_descartar">Descartar</string>
+    <string name="borrador_seguir_editando">Seguir editando</string>
+
+    <!-- Médico: adendas -->
+    <string name="adenda_agregar">Agregar adenda</string>
+    <string name="adenda_titulo">Nueva adenda</string>
+    <string name="adenda_explicacion">La atención no se puede modificar. Para corregirla o completarla, registra una adenda: queda visible para el paciente en su expediente.</string>
+    <string name="adenda_texto">Texto de la adenda</string>
+    <string name="adenda_motivo">Motivo de la adenda</string>
+    <string name="adenda_confirmar_titulo">Confirma la adenda</string>
+    <string name="adenda_inmutable">La adenda no se puede editar ni borrar después de registrarla.</string>
+    <string name="adenda_confirmar">Confirmar y registrar adenda</string>
+    <string name="adenda_guardada">Spring registró la adenda.</string>
+    <string name="adenda_volver">Volver a la cita</string>
+    <string name="adenda_404">No encontramos esta atención en tus citas. No se registró la adenda.</string>
+    <string name="adenda_no_guardada">No pudimos confirmar el envío y la adenda no aparece en la atención. Inténtalo de nuevo.</string>
+    <string name="adenda_incierta">No pudimos comprobar si la adenda se registró. Revisa tu conexión; antes de reenviarla comprobaremos la cita.</string>
+    <string name="adenda_validacion_texto">El texto debe tener entre 3 y 2000 caracteres.</string>
+    <string name="adenda_validacion_motivo">El motivo debe tener entre 3 y 500 caracteres.</string>
+
+    <!-- Médico: odontograma -->
+    <string name="odontograma_titulo">Odontograma</string>
+    <string name="odontograma_historial">Historial de observaciones</string>
+    <string name="odontograma_aviso_historial">Son observaciones registradas en el tiempo; no representan el estado actual de la pieza.</string>
+    <string name="odontograma_vacio">Este paciente aún no tiene observaciones registradas.</string>
+    <string name="odontograma_permanente">Dentición permanente</string>
+    <string name="odontograma_temporal">Dentición temporal</string>
+    <string name="odontograma_pieza">Pieza %1$d</string>
+    <string name="odontograma_sin_superficie">Sin superficie</string>
+    <string name="odontograma_registrada">Registrada el %1$s</string>
+    <string name="odontograma_esta_cita">En esta cita</string>
+    <string name="odontograma_agregar">Agregar observación</string>
+    <string name="odontograma_disponible">Puedes agregar observaciones en esta cita. Hazlo antes de registrar la atención.</string>
+    <string name="odontograma_no_disponible_titulo">No se pueden agregar observaciones en esta cita</string>
+    <string name="odontograma_bloqueo_atencion">La atención de esta cita ya se registró: el odontograma de esta cita ya no admite observaciones.</string>
+    <string name="odontograma_bloqueo_estado">La cita está completada o cancelada: no admite observaciones nuevas.</string>
+    <string name="odontograma_paciente_no_encontrado">No encontramos a este paciente en tu agenda.</string>
+    <string name="odontograma_nueva_titulo">Nueva observación</string>
+    <string name="odontograma_elige_pieza">Pieza dental (FDI)</string>
+    <string name="odontograma_elige_superficie">Superficie</string>
+    <string name="odontograma_observacion">Observación</string>
+    <string name="odontograma_pieza_elegida">Pieza elegida: %1$d</string>
+    <string name="odontograma_ninguna_pieza">Ninguna pieza elegida</string>
+    <string name="odontograma_cuadrante">Cuadrante %1$d</string>
+    <string name="odontograma_confirmar_titulo">Confirma la observación</string>
+    <string name="odontograma_inmutable">La observación no se puede editar ni borrar. Se suma al historial de la pieza.</string>
+    <string name="odontograma_confirmar">Confirmar y registrar observación</string>
+    <string name="odontograma_guardada">Spring registró la observación.</string>
+    <string name="odontograma_volver">Volver al odontograma</string>
+    <string name="odontograma_validacion_pieza">Elige una pieza dental válida (FDI).</string>
+    <string name="odontograma_validacion_superficie">Elige una superficie.</string>
+    <string name="odontograma_validacion_observacion">La observación debe tener entre 1 y 500 caracteres.</string>
+    <string name="odontograma_409_no_documentable">La cita está completada o cancelada: ya no admite observaciones. Si ya registraste la atención, el odontograma de esta cita quedó cerrado.</string>
+    <string name="odontograma_409_no_iniciada">La cita aún no comienza; podrás agregar observaciones a partir de su hora.</string>
+    <string name="odontograma_409_sin_llegada">Recepción aún no registra la llegada del paciente; no se pueden agregar observaciones todavía.</string>
+    <string name="odontograma_409_generico">La cita no admite observaciones en este momento.</string>
+    <string name="odontograma_404">No encontramos esta cita en tu agenda. No se registró la observación.</string>
+    <string name="odontograma_no_guardada">No pudimos confirmar el envío y la observación no aparece en el historial. Inténtalo de nuevo.</string>
+    <string name="odontograma_incierto">No pudimos comprobar si la observación se registró. Revisa tu conexión; antes de reenviarla comprobaremos el historial.</string>
+    <string name="superficie_mesial">Mesial</string>
+    <string name="superficie_distal">Distal</string>
+    <string name="superficie_vestibular">Vestibular</string>
+    <string name="superficie_lingual">Lingual</string>
+    <string name="superficie_palatina">Palatina</string>
+    <string name="superficie_oclusal">Oclusal</string>
+    <string name="superficie_incisal">Incisal</string>
 </resources>

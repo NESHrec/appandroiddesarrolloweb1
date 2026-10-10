@@ -46,7 +46,12 @@ data class AttentionFormUiState(
     val recorded: Attention? = null,
     /** 401 al confirmar: el borrador se conserva y se reintenta una vez tras el re-login. */
     val awaitingReauth: Boolean = false,
+    /** Diálogo "¿Descartar borrador?" visible. */
+    val confirmDiscard: Boolean = false,
 ) {
+    val hasChanges: Boolean
+        get() = listOf(reason, findings, diagnosis, treatmentPlan).any { it.isNotBlank() } || items.isNotEmpty()
+
     override fun toString(): String = "AttentionFormUiState(step=$step, items=${items.size}, submitting=$submitting)"
 }
 
@@ -117,6 +122,23 @@ class AttentionFormViewModel(
     fun backToForm() {
         if (_state.value.submitting) return
         _state.update { it.copy(step = FormStep.FORM, error = null) }
+    }
+
+    /** Flecha, botón Atrás o gesto. */
+    fun onBack(): FormBack {
+        val current = _state.value
+        val action = formBack(current.step, current.hasChanges)
+        if (current.step == FormStep.CONFIRM) backToForm()
+        if (current.step == FormStep.FORM && action == FormBack.STAY) _state.update { it.copy(confirmDiscard = true) }
+        return action
+    }
+
+    fun keepEditing() = _state.update { it.copy(confirmDiscard = false) }
+
+    /** Borra el borrador de la memoria; nunca estuvo en disco. */
+    fun discardDraft() {
+        uncertainAttempt = false
+        _state.value = AttentionFormUiState()
     }
 
     fun submit() {

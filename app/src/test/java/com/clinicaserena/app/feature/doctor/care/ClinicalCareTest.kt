@@ -6,13 +6,18 @@ import com.clinicaserena.app.core.network.ApiTestRig
 import com.clinicaserena.app.core.network.FieldError
 import com.clinicaserena.app.core.time.ClinicTime
 import com.clinicaserena.app.core.ui.UserMessage
+import com.clinicaserena.app.data.doctor.AddendumRequest
 import com.clinicaserena.app.data.doctor.ClinicalProfileRequest
+import com.clinicaserena.app.data.doctor.DentalObservationRequest
 import com.clinicaserena.app.data.doctor.DateRange
 import com.clinicaserena.app.data.doctor.DoctorApi
 import com.clinicaserena.app.data.doctor.DoctorRepository
 import com.clinicaserena.app.data.doctor.RecordAttentionRequest
 import com.clinicaserena.app.data.doctor.RemoteDoctorRepository
+import com.clinicaserena.app.domain.model.Addendum
 import com.clinicaserena.app.domain.model.AppointmentStatus
+import com.clinicaserena.app.domain.model.DentalObservation
+import com.clinicaserena.app.domain.model.Odontogram
 import com.clinicaserena.app.domain.model.Attention
 import com.clinicaserena.app.domain.model.ClinicalProfile
 import com.clinicaserena.app.domain.model.ClinicalRecord
@@ -72,6 +77,11 @@ private class FakeCareRepository : DoctorRepository {
         gate?.await()
         return profileResults.removeFirst()
     }
+    override suspend fun addAddendum(appointmentId: String, attentionId: String, request: AddendumRequest): ApiResult<Addendum> =
+        error("no se usa")
+    override suspend fun odontogram(patientId: String): ApiResult<Odontogram> = error("no se usa")
+    override suspend fun addObservation(appointmentId: String, request: DentalObservationRequest): ApiResult<DentalObservation> =
+        error("no se usa")
 }
 
 class AttentionFormViewModelTest {

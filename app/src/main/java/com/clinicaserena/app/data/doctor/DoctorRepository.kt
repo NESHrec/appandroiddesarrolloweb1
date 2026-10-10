@@ -3,15 +3,20 @@ package com.clinicaserena.app.data.doctor
 import com.clinicaserena.app.core.network.ApiCaller
 import com.clinicaserena.app.core.network.ApiResult
 import com.clinicaserena.app.core.time.ClinicTime
+import com.clinicaserena.app.data.patient.AddendumResponse
 import com.clinicaserena.app.data.patient.AttentionResponse
 import com.clinicaserena.app.data.patient.ClinicalProfileResponse
 import com.clinicaserena.app.data.patient.ClinicalRecordResponse
 import com.clinicaserena.app.data.patient.toDomain
+import com.clinicaserena.app.domain.model.Addendum
 import com.clinicaserena.app.domain.model.AppointmentStatus
 import com.clinicaserena.app.domain.model.Attention
 import com.clinicaserena.app.domain.model.AttentionBlocker
 import com.clinicaserena.app.domain.model.ClinicalProfile
 import com.clinicaserena.app.domain.model.ClinicalRecord
+import com.clinicaserena.app.domain.model.DentalObservation
+import com.clinicaserena.app.domain.model.Odontogram
+import com.clinicaserena.app.domain.model.ToothSurface
 import com.clinicaserena.app.domain.model.DoctorAppointment
 import com.clinicaserena.app.domain.model.DoctorAppointmentDetail
 import kotlinx.serialization.Serializable
@@ -81,6 +86,36 @@ data class ClinicalProfileRequest(
     val dentalHistory: String?,
 )
 
+/** `CreateAddendumRequest`: texto 3–2000 y motivo 3–500. */
+@Serializable
+data class AddendumRequest(val text: String, val reason: String)
+
+/** `RecordDentalObservationRequest`: pieza FDI, superficie y observación 1–500. */
+@Serializable
+data class DentalObservationRequest(val toothNumber: Int, val surface: String, val observation: String)
+
+/** `DentalObservationResponse`. Los IDs del profesional y del autor no se muestran. */
+@Serializable
+data class DentalObservationResponse(
+    val id: String,
+    val patientId: String,
+    val appointmentId: String,
+    val practitionerId: String? = null,
+    val recordedByAccountId: String? = null,
+    val toothNumber: Int,
+    val surface: String? = null,
+    val observation: String,
+    val recordedAt: String,
+)
+
+/** `DentalObservationPageResponse`: observaciones del paciente, de la más reciente a la más antigua. */
+@Serializable
+data class DentalObservationPageResponse(
+    val patientId: String,
+    val patientName: String? = null,
+    val observations: List<DentalObservationResponse> = emptyList(),
+)
+
 /** `MedicalCareController`: el profesional sale de la cuenta autenticada; nunca se envía su ID. */
 interface DoctorApi {
     @GET("medico/citas")
@@ -108,6 +143,23 @@ interface DoctorApi {
         @Path("appointmentId") appointmentId: String,
         @Body body: ClinicalProfileRequest,
     ): Response<ClinicalProfileResponse>
+
+    @POST("medico/citas/{appointmentId}/atenciones/{attentionId}/adendas")
+    suspend fun addAddendum(
+        @Path("appointmentId") appointmentId: String,
+        @Path("attentionId") attentionId: String,
+        @Body body: AddendumRequest,
+    ): Response<AddendumResponse>
+
+    /** `OdontogramaController`. */
+    @GET("medico/pacientes/{patientId}/odontograma")
+    suspend fun odontogram(@Path("patientId") patientId: String): Response<DentalObservationPageResponse>
+
+    @POST("medico/citas/{appointmentId}/odontograma")
+    suspend fun addObservation(
+        @Path("appointmentId") appointmentId: String,
+        @Body body: DentalObservationRequest,
+    ): Response<DentalObservationResponse>
 }
 
 /** Rango `[from, to)` con offset explícito para `/medico/citas`. */
@@ -126,6 +178,15 @@ interface DoctorRepository {
 
     /** Agrega una versión nueva del perfil clínico (las anteriores quedan en el historial). */
     suspend fun addClinicalProfile(appointmentId: String, request: ClinicalProfileRequest): ApiResult<ClinicalProfile>
+
+    /** Agrega una adenda (inmutable) a la atención de una cita propia. */
+    suspend fun addAddendum(appointmentId: String, attentionId: String, request: AddendumRequest): ApiResult<Addendum>
+
+    /** Historial de observaciones del paciente; 404 `PATIENT_NOT_FOUND` si nunca tuvo cita con este médico. */
+    suspend fun odontogram(patientId: String): ApiResult<Odontogram>
+
+    /** Agrega una observación (inmutable) mientras la cita es documentable. */
+    suspend fun addObservation(appointmentId: String, request: DentalObservationRequest): ApiResult<DentalObservation>
 
     companion object {
         const val MAX_LIMIT = 100
@@ -164,6 +225,23 @@ class RemoteDoctorRepository(
     ): ApiResult<ClinicalProfile> =
         apiCaller.call(authenticated = true) { api.addClinicalProfile(appointmentId, request) }.mapSafely { it.toDomain() }
 
+    override suspend fun addAddendum(
+        appointmentId: String,
+        attentionId: String,
+        request: AddendumRequest,
+    ): ApiResult<Addendum> =
+        apiCaller.call(authenticated = true) { api.addAddendum(appointmentId, attentionId, request) }.mapSafely {
+            Addendum(it.text, it.reason, it.authorName, ClinicTime.parse(it.recordedAt))
+        }
+
+    override suspend fun odontogram(patientId: String): ApiResult<Odontogram> =
+        apiCaller.call(authenticated = true) { api.odontogram(patientId) }.mapSafely { page ->
+            Odontogram(page.patientName, page.observations.map { it.toDomain() })
+        }
+
+    override suspend fun addObservation(appointmentId: String, request: DentalObservationRequest): ApiResult<DentalObservation> =
+        apiCaller.call(authenticated = true) { api.addObservation(appointmentId, request) }.mapSafely { it.toDomain() }
+
     private inline fun <T, R> ApiResult<T>.mapSafely(transform: (T) -> R): ApiResult<R> = when (this) {
         is ApiResult.Success -> try {
             ApiResult.Success(transform(data))
@@ -193,4 +271,14 @@ internal fun MedicalAppointmentResponse.toDomain() = DoctorAppointment(
     canRecordAttention = canRecordAttention,
     blockers = attentionBlockers.map { AttentionBlocker.from(it) },
     blockersRaw = attentionBlockers,
+)
+
+internal fun DentalObservationResponse.toDomain() = DentalObservation(
+    id = id,
+    appointmentId = appointmentId,
+    toothNumber = toothNumber,
+    surface = surface?.let { ToothSurface.from(it) },
+    surfaceRaw = surface,
+    observation = observation,
+    recordedAt = ClinicTime.parse(recordedAt),
 )

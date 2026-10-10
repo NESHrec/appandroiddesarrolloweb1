@@ -233,6 +233,16 @@ class DoctorAgendaViewModelsTest {
             appointmentId: String,
             request: com.clinicaserena.app.data.doctor.ClinicalProfileRequest,
         ): ApiResult<com.clinicaserena.app.domain.model.ClinicalProfile> = error("no se usa")
+        override suspend fun addAddendum(
+            appointmentId: String,
+            attentionId: String,
+            request: com.clinicaserena.app.data.doctor.AddendumRequest,
+        ): ApiResult<com.clinicaserena.app.domain.model.Addendum> = error("no se usa")
+        override suspend fun odontogram(patientId: String): ApiResult<com.clinicaserena.app.domain.model.Odontogram> = error("no se usa")
+        override suspend fun addObservation(
+            appointmentId: String,
+            request: com.clinicaserena.app.data.doctor.DentalObservationRequest,
+        ): ApiResult<com.clinicaserena.app.domain.model.DentalObservation> = error("no se usa")
     }
 
     @Test

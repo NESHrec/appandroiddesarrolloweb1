@@ -1,6 +1,5 @@
 package com.clinicaserena.app.feature.doctor.care
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -81,7 +80,7 @@ fun ClinicalTextField(
 }
 
 @Composable
-private fun ImmutableNotice(message: String, testTag: String) {
+internal fun ImmutableNotice(message: String, testTag: String) {
     StatusBanner(
         iconRes = R.drawable.ic_lock,
         title = stringResource(R.string.atencion_inmutable_titulo),
@@ -92,7 +91,7 @@ private fun ImmutableNotice(message: String, testTag: String) {
 }
 
 @Composable
-private fun ErrorNotice(message: UserMessage, testTag: String) {
+internal fun ErrorNotice(message: UserMessage, testTag: String) {
     StatusBanner(
         iconRes = R.drawable.ic_error,
         title = stringResource(R.string.atencion_no_registrada_titulo),
@@ -107,14 +106,11 @@ private fun ErrorNotice(message: UserMessage, testTag: String) {
 @Composable
 fun AttentionFormScreen(viewModel: AttentionFormViewModel, onExit: () -> Unit, onDone: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val goBack = {
-        when (state.step) {
-            FormStep.CONFIRM -> viewModel.backToForm()
-            FormStep.DONE -> onDone()
-            FormStep.FORM -> onExit()
-        }
+    val goBack = rememberFormBack(viewModel::onBack, onExit, onFinished = onDone)
+    DiscardDraftDialog(state.confirmDiscard, onKeepEditing = viewModel::keepEditing) {
+        viewModel.discardDraft()
+        onExit()
     }
-    BackHandler(onBack = goBack)
 
     BackScaffold(
         title = stringResource(
@@ -260,10 +256,13 @@ private fun AttentionConfirm(state: AttentionFormUiState, viewModel: AttentionFo
 // ---------------------------------------------------------------- Perfil clínico
 
 @Composable
-fun ClinicalProfileFormScreen(viewModel: ClinicalProfileFormViewModel, onExit: () -> Unit) {
+fun ClinicalProfileFormScreen(viewModel: ClinicalProfileFormViewModel, onExit: () -> Unit, onDone: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val goBack = { if (state.step == FormStep.CONFIRM) viewModel.backToForm() else onExit() }
-    BackHandler(onBack = goBack)
+    val goBack = rememberFormBack(viewModel::onBack, onExit, onFinished = onDone)
+    DiscardDraftDialog(state.confirmDiscard, onKeepEditing = viewModel::keepEditing) {
+        viewModel.discardDraft()
+        onExit()
+    }
     val labels = mapOf(
         ProfileField.ALLERGIES to R.string.expediente_alergias,
         ProfileField.CONDITIONS to R.string.expediente_condiciones,
@@ -342,8 +341,98 @@ fun ClinicalProfileFormScreen(viewModel: ClinicalProfileFormViewModel, onExit: (
                         modifier = Modifier.testTag("profile_done"),
                     )
                     state.saved?.let { ClinicalCard { ProfileFields(it) } }
-                    Button(onClick = onExit, modifier = Modifier.fillMaxWidth()) {
+                    Button(onClick = onDone, modifier = Modifier.fillMaxWidth()) {
                         Text(stringResource(R.string.perfil_clinico_volver))
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------- Adenda
+
+@Composable
+fun AddendumFormScreen(viewModel: AddendumFormViewModel, onExit: () -> Unit, onDone: () -> Unit) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val goBack = rememberFormBack(viewModel::onBack, onExit, onFinished = onDone)
+    DiscardDraftDialog(state.confirmDiscard, onKeepEditing = viewModel::keepEditing) {
+        viewModel.discardDraft()
+        onExit()
+    }
+
+    BackScaffold(
+        title = stringResource(if (state.step == FormStep.CONFIRM) R.string.adenda_confirmar_titulo else R.string.adenda_titulo),
+        onBack = goBack,
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            when (state.step) {
+                FormStep.FORM -> {
+                    Text(stringResource(R.string.adenda_explicacion), style = MaterialTheme.typography.bodyMedium)
+                    state.error?.let { ErrorNotice(it, "addendum_form_error") }
+                    ClinicalTextField(
+                        state.text, { viewModel.onChange(AddendumField.TEXT, it) }, stringResource(R.string.adenda_texto),
+                        AddendumFormViewModel.TEXT_MAX, state.fieldErrors[AddendumField.TEXT], "addendum_text",
+                    )
+                    ClinicalTextField(
+                        state.reason, { viewModel.onChange(AddendumField.REASON, it) }, stringResource(R.string.adenda_motivo),
+                        AddendumFormViewModel.REASON_MAX, state.fieldErrors[AddendumField.REASON], "addendum_reason",
+                    )
+                    Button(onClick = viewModel::review, modifier = Modifier.fillMaxWidth().testTag("addendum_review")) {
+                        Text(stringResource(R.string.atencion_revisar))
+                    }
+                }
+                FormStep.CONFIRM -> {
+                    val request = state.toRequest()
+                    ClinicalCard(testTag = "addendum_summary") {
+                        SectionTitle(stringResource(R.string.atencion_resumen))
+                        InfoRow(stringResource(R.string.adenda_texto), request.text)
+                        InfoRow(stringResource(R.string.adenda_motivo), request.reason)
+                    }
+                    ImmutableNotice(stringResource(R.string.adenda_inmutable), "addendum_immutable_notice")
+                    if (state.awaitingReauth) {
+                        StatusBanner(
+                            iconRes = R.drawable.ic_schedule,
+                            title = stringResource(R.string.estado_sesion_vencida_titulo),
+                            message = stringResource(R.string.atencion_esperando_sesion),
+                            background = LocalStatusColors.current.warning,
+                        )
+                    }
+                    state.error?.let { ErrorNotice(it, "addendum_error") }
+                    SubmitButton(
+                        text = stringResource(R.string.adenda_confirmar),
+                        submitting = state.submitting,
+                        onClick = viewModel::submit,
+                        testTag = "addendum_confirm",
+                    )
+                    TextButton(onClick = viewModel::backToForm, enabled = !state.submitting, modifier = Modifier.testTag("addendum_edit")) {
+                        Text(stringResource(R.string.atencion_volver_a_editar))
+                    }
+                    DebugSessionTools()
+                }
+                FormStep.DONE -> {
+                    StatusBanner(
+                        iconRes = R.drawable.ic_check_circle,
+                        title = stringResource(R.string.estado_exito_titulo),
+                        message = stringResource(R.string.adenda_guardada),
+                        background = LocalStatusColors.current.success,
+                        modifier = Modifier.testTag("addendum_done"),
+                    )
+                    state.saved?.let {
+                        ClinicalCard {
+                            InfoRow(stringResource(R.string.adenda_texto), it.text)
+                            InfoRow(stringResource(R.string.adenda_motivo), it.reason)
+                        }
+                    }
+                    Button(onClick = onDone, modifier = Modifier.fillMaxWidth().testTag("addendum_back")) {
+                        Text(stringResource(R.string.adenda_volver))
                     }
                 }
             }

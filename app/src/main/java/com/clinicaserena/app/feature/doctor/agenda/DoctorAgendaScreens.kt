@@ -228,6 +228,7 @@ fun DoctorAppointmentDetailScreen(
     onRecordAttention: () -> Unit,
     onOpenRecord: () -> Unit,
     onOpenOdontogram: () -> Unit,
+    onAddAddendum: (attentionId: String) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -300,6 +301,11 @@ fun DoctorAppointmentDetailScreen(
                     load.data.attention?.let {
                         SectionHeader(stringResource(R.string.medico_atencion_registrada))
                         AttentionCard(it)
+                        // La atención es inmutable: las correcciones se agregan como adendas.
+                        OutlinedButton(
+                            onClick = { onAddAddendum(it.id) },
+                            modifier = Modifier.fillMaxWidth().testTag("detail_add_addendum"),
+                        ) { Text(stringResource(R.string.adenda_agregar)) }
                     }
                 }
             }
