@@ -387,4 +387,7 @@
     <string name="superficie_palatina">Palatina</string>
     <string name="superficie_oclusal">Oclusal</string>
     <string name="superficie_incisal">Incisal</string>
+
+    <!-- Fotos públicas de profesionales -->
+    <string name="foto_de_profesional">Foto de %1$s</string>
 </resources>

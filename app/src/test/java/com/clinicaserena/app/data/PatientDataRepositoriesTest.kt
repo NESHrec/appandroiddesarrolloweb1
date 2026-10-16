@@ -96,6 +96,22 @@ class PatientDataRepositoriesTest {
     }
 
     @Test
+    fun `medicos con photoUrl y active, y sin esos campos en un backend anterior`() = runTest {
+        rig.enqueue(
+            200,
+            """[{"id":"m1","fullName":"Dra. Elena Morales","specialtyId":"e1","specialtyName":"Odontología general","licenseNumber":"X","active":true,"photoUrl":"/api/v1/medicos/m1/foto?v=k.png"},""" +
+                """{"id":"m2","fullName":"Dr. Mateo Rivera","specialtyId":"e2","specialtyName":"Ortodoncia","licenseNumber":"Y","active":true,"photoUrl":null},""" +
+                """{"id":"m3","fullName":"Dra. Antes","specialtyId":"e1","specialtyName":"Odontología general"}]""",
+        )
+
+        val practitioners = (catalog.allPractitioners() as ApiResult.Success).data.associateBy { it.id }
+
+        assertEquals("/api/v1/medicos/m1/foto?v=k.png", practitioners.getValue("m1").photoUrl)
+        assertNull(practitioners.getValue("m2").photoUrl)
+        assertNull(practitioners.getValue("m3").photoUrl)
+    }
+
+    @Test
     fun `una fecha ilegible en la respuesta es Unexpected`() = runTest {
         rig.enqueue(200, """[{"id":"s","practitionerId":"m","startAt":"mañana","endAt":"x"}]""")
 

@@ -9,6 +9,8 @@ data class AppointmentItem(
     val appointment: Appointment,
     val practitionerName: String?,
     val specialtyName: String?,
+    /** `null` si el médico no tiene foto o ya no está en `/medicos` (inactivo): se muestran sus iniciales. */
+    val practitionerPhotoUrl: String? = null,
 )
 
 enum class AppointmentTab { UPCOMING, HISTORY }

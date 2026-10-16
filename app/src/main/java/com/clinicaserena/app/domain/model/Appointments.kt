@@ -9,6 +9,8 @@ data class Practitioner(
     val fullName: String,
     val specialtyId: String,
     val specialtyName: String,
+    /** Ruta relativa de la foto pública; se resuelve contra la URL base de la API (`resolvePhotoUrl`). */
+    val photoUrl: String? = null,
 )
 
 /**

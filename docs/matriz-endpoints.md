@@ -16,7 +16,7 @@ Todas las rutas cuelgan de `/api/v1`.
 
 La columna «Errores manejados» lista los códigos que tienen un mensaje o un comportamiento propio en la pantalla. Los demás usan el mensaje genérico de su tipo (`core/ui/UserMessages.kt`).
 
-**Verificado en vivo** indica en qué fase se recorrió el endpoint contra Spring real (B1–B3 paciente, C1–C3 médico, E1a build minificado `qaLocal`).
+**Verificado en vivo** indica en qué fase se recorrió el endpoint contra Spring real (B1–B3 paciente, C1–C3 médico, E1a build minificado `qaLocal`, «fotos» la rama `feature/fotos-medicos`).
 
 ## Acceso y sesión
 
@@ -37,7 +37,8 @@ La columna «Errores manejados» lista los códigos que tienen un mensaje o un c
 | Endpoint | Método | Rol | Pantalla Android | Errores manejados | Verificado en vivo |
 |---|---|---|---|---|---|
 | `/especialidades` | GET | Público | Reserva → Elige la especialidad | Genéricos y lista vacía | B2, E1a |
-| `/medicos?specialtyId=` | GET | Público | Reserva → Elige el médico (solo médicos activos desde V15) | Genéricos y lista vacía | B2, E1a |
+| `/medicos?specialtyId=` | GET | Público | Reserva → Elige el médico (solo médicos activos desde V15). También da `photoUrl`, la ruta relativa de la foto o `null` | Genéricos y lista vacía | B2, E1a, fotos |
+| `/medicos/{id}/foto` (la ruta exacta viene en `photoUrl`, con `?v=`) | GET | Público, **sin Bearer** (cliente HTTP propio) | Avatar del médico al elegirlo, en la confirmación y «Cita reservada», y en el detalle de la cita | 404 `PHOTO_NOT_FOUND`, red, tipo distinto de `image/jpeg` o `image/png`, más de 2 MB o más de 4096 px por lado: se muestran las iniciales, sin error visible. Caché solo en memoria, vaciada al cerrar o vencer la sesión | fotos |
 | `/medicos/{id}/disponibilidad?from&to` | GET | Público | Reserva → Elige el horario (sin bloques retirados desde V14) | `PRACTITIONER_NOT_FOUND`: el médico ya no está disponible. `INVALID_DATE_RANGE`: genérico. Sin bloques: estado vacío | B2, E1a |
 | `/citas` | POST | PACIENTE | Reserva → Confirmar | `SLOT_NOT_AVAILABLE`, `SLOT_NOT_FOUND` y `SLOT_IN_PAST`: el horario ya no está disponible, se refresca la disponibilidad y no se muestra éxito. `SLOT_PRACTITIONER_MISMATCH`, `SPECIALTY_PRACTITIONER_MISMATCH`, `PRACTITIONER_NOT_FOUND`, `SPECIALTY_NOT_FOUND`, `SCHEDULED_AT_INVALID` y `NOTES_TOO_LONG` tienen mensaje propio. Red o 5xx: consulta «Mis citas» antes de reintentar | B2, E1a |
 | `/pacientes/me/citas` | GET | PACIENTE | Inicio (próxima cita), Citas (próximas e historial con filtros) y detalle de la cita, armado con los datos de la lista | Genéricos; vacío por filtro | B2, E1a |
@@ -72,7 +73,6 @@ Quedan fuera del alcance de la app (ADMIN y RECEPCION), o existen pero no se int
 |---|---|---|
 | `/auth/verify-email`, `/auth/password-reset` | Público | Se completan en la web, con el enlace del correo (`AUTH_PUBLIC_WEB_URL`) |
 | `/auth/login`, `/staff/auth/login` | Público | La app usa `login-unified` |
-| `/medicos/{id}/foto` (GET) | Público | Nuevo en `7fa072d`. Posible mejora: mostrar la foto del médico al reservar |
 | `/staff/medico/horarios` (GET, POST) y `/staff/medico/horarios/{blockId}` (PATCH, DELETE) | MEDICO | El médico crea, edita y retira bloques desde la web. PATCH y DELETE son nuevos en `7fa072d` |
 | `/staff/accounts/**`, `/staff/especialidades/**`, `/staff/medicos/**`, `/staff/audit-events` | ADMIN | Administración |
 | `/staff/agenda`, `/staff/agenda/{id}/arrival`, `/staff/patients/**`, `/staff/patient-link-requests/*`, `/staff/billing/**` | RECEPCION (y ADMIN en algunas lecturas) | Recepción: agenda, llegada, pacientes administrativos, vinculación y cobros |

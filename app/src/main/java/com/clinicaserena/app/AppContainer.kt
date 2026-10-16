@@ -3,6 +3,9 @@ package com.clinicaserena.app
 import android.content.Context
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.compose.ui.graphics.ImageBitmap
+import com.clinicaserena.app.core.image.BitmapPhotoDecoder
+import com.clinicaserena.app.core.image.PractitionerPhotoLoader
 import com.clinicaserena.app.core.network.ApiCaller
 import com.clinicaserena.app.core.network.ErrorMapper
 import com.clinicaserena.app.core.network.NetworkLogging
@@ -73,6 +76,15 @@ class AppContainer(context: Context) {
                 extraInterceptors = NetworkLogging.interceptors(),
             ),
         )
+    }
+
+    /** Fotos públicas de profesionales: sin Bearer, solo en memoria y vaciadas al cerrar o vencer la sesión. */
+    val practitionerPhotoLoader: PractitionerPhotoLoader<ImageBitmap> by lazy {
+        PractitionerPhotoLoader(
+            apiBaseUrl = apiBaseUrl,
+            client = NetworkModule.publicOkHttpClient(NetworkLogging.interceptors()),
+            decoder = BitmapPhotoDecoder(),
+        ).also { it.bindToSession(sessionManager.state, appScope) }
     }
 
     val authRepository: AuthRepository by lazy {

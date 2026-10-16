@@ -1,5 +1,9 @@
 package com.clinicaserena.app.feature.patient.appointments
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import com.clinicaserena.app.core.ui.components.PractitionerAvatar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -247,10 +251,7 @@ private fun AppointmentDetailContent(item: AppointmentItem) {
                 stringResource(R.string.cita_especialidad),
                 item.specialtyName ?: stringResource(R.string.cita_especialidad_desconocida),
             )
-            InfoRow(
-                stringResource(R.string.cita_medico),
-                item.practitionerName ?: stringResource(R.string.cita_medico_desconocido),
-            )
+            PractitionerRow(item.practitionerName, item.practitionerPhotoUrl)
             InfoRow(
                 stringResource(R.string.cita_notas),
                 appointment.notes?.takeIf { it.isNotBlank() } ?: stringResource(R.string.cita_sin_notas),
@@ -266,4 +267,17 @@ private fun AppointmentDetailContent(item: AppointmentItem) {
         message = stringResource(R.string.cita_cambios_mensaje),
         background = LocalStatusColors.current.info,
     )
+}
+
+/** Fila «Médico» con su foto pública (o iniciales). Sin nombre conocido, solo el texto de respaldo. */
+@Composable
+private fun PractitionerRow(name: String?, photoUrl: String?) {
+    val shown = name ?: stringResource(R.string.cita_medico_desconocido)
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
+        if (name != null) {
+            PractitionerAvatar(name = name, photoUrl = photoUrl, size = 64.dp)
+            Spacer(Modifier.width(12.dp))
+        }
+        Box(Modifier.weight(1f)) { InfoRow(stringResource(R.string.cita_medico), shown) }
+    }
 }
