@@ -64,9 +64,23 @@
 - Firma de release desde un .properties FUERA del repo (`-PclinicaSerena.signingProperties` o `CLINICA_SERENA_SIGNING_PROPERTIES`); sin configurar, el release sale sin firmar. Llave de prueba en ~/Desktop/clinica-serena-local/firma/; la custodia de la definitiva está pendiente.
 - URL de producción: `-PclinicaSerena.releaseApiBaseUrl`, HTTPS obligatorio, con host, sin credenciales y terminada en `/`.
 
-## Git
-- No hacer commit ni push sin que yo lo pida.
-- No subir APK, secretos, `.env` ni informes locales.
+## Git (acordado con el equipo)
+- Nunca hacer commit ni push directo a main ni a desarrollo.
+- Cada cambio va en una rama feature/*, fix/* o chore/* creada desde desarrollo actualizada, con PR hacia desarrollo.
+- Nunca hacer merge de un PR: lo revisa el equipo (app: NESHrec; backend: Erick).
+- No cambiar la rama por defecto ni las protecciones de GitHub.
+- Backend: rama feature/notificaciones-push desde desarrollo; migración reservada: V17.
+- No subir APK, llaves, .properties de firma, secretos, .env ni informes locales.
+
+## Acuerdos del equipo (15/10/2026)
+- Push: un recordatorio 24 h antes, solo a pacientes, sin diagnóstico, receta ni otro dato clínico; sin duplicados; respetando la zona horaria configurada.
+- Firebase: proyecto bajo una cuenta del equipo (pendiente). Mientras tanto, solo un envío simulado limitado a pruebas: no registra tokens reales y nunca se presenta como push entregado. Credenciales siempre fuera de Git.
+- HTTPS obligatorio en cualquier despliegue; nada de HTTP en la versión de entrega. Pruebas locales en teléfono con adb reverse.
+- Demo: APK de depuración. Un APK firmado solo después de acordar quién custodia la llave.
+- Fuera de esta fase: cancelar/reprogramar citas, paginación y editar o retirar horarios.
+- Detalle de cita del paciente: antes de proponer un endpoint, documentar exactamente qué dato falta.
+- Fotos públicas de profesionales: sí, si el contrato actual lo permite.
+- Fecha de entrega: pendiente de confirmar.
 
 ## Acciones prohibidas sin pedirme permiso
 - git commit, git push, git reset, git rebase o cualquier cambio de historial.
