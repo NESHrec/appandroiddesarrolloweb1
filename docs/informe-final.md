@@ -80,7 +80,7 @@ Se probó contra el backend real en el perfil dev, con Mailpit y la web local pa
 | T5 ★ | Sin red: «No hay conexión con el servidor» y Reintentar; se recupera | OK |
 | T6 ★ | ADMIN y RECEPCION: mensaje de rol no soportado y su sesión queda revocada | OK |
 | T7 | Privacidad: en todo el logcat de la prueba (unas 177 000 líneas, ambos builds) hay 0 Bearer, `accessToken`, `Authorization`, contraseñas, tokens de verificación o textos clínicos sintéticos; buffer de crashes vacío. Tras el logout, en disco solo quedan la sesión vacía (0 bytes) y `profileInstalled` | OK |
-| T8 | Accesibilidad: 720×1280, 320 dpi y letra 1.5× en Inicio, reserva con foto, detalle, atención y odontograma | OK, con 1 observación (sección 7) |
+| T8 | Accesibilidad: 720×1280, 320 dpi y letra 1.5× en Inicio, reserva con foto, detalle, atención y odontograma | OK; la observación de accesibilidad de los filtros ya está corregida (sección 7) |
 
 Las fases B a E1 ya se habían verificado en vivo en su momento: bloqueo tras 5 intentos de login, aislamiento con dos médicos, reglas del odontograma, etc. Los hallazgos de cada fase están en `CLAUDE.md`.
 
@@ -101,7 +101,11 @@ Las fases B a E1 ya se habían verificado en vivo en su momento: bloqueo tras 5 
 - **Recuperación de contraseña del personal:** no existe; solo la del paciente, por la web.
 - Las observaciones del odontograma **no traen su autor**.
 - **Recordatorios push:** una cita reservada con menos de unas 22 h de anticipación no recibe el recordatorio de 24 h.
-- **Accesibilidad (observación de E2):** el filtro seleccionado en «Mis citas» (por ejemplo, «Esta semana») indica su estado solo con el color. Conviene agregar un ícono de marca o un texto.
+- **Accesibilidad (observación de E2, corregida):** los filtros de «Mis citas» y del Inicio y la Agenda del médico (por ejemplo, «Esta semana») indicaban el elegido solo con el color.
+  - Corregido en la rama `feature/fotos-medicos` (PR #2), commit `4be4948`. Va en esa rama porque el PR #2 también modifica `AppointmentScreens.kt`.
+  - Ahora todos usan `SelectableFilterChip`, que agrega un ícono de check al filtro elegido. Es el mismo chip que ya usaba el odontograma.
+  - TalkBack recibe el estado «seleccionado» desde `FilterChip`. Compose lo publica a Android como un nodo marcable y marcado (`checked=true` en uiautomator). Solo usa `selected=true` en las pestañas, y no se cambió el rol para no anunciar los filtros como «pestaña».
+  - Verificado en el emulador con capturas y uiautomator.
 
 ## 8. Pendientes
 
@@ -147,7 +151,7 @@ Son APK de depuración: solo hablan con un backend local y no sirven para distri
 
 **Al 16/10/2026, ninguno está fusionado en `desarrollo`:**
 - **App PR #1** `chore/flujo-ramas-y-acuerdos`: flujo de ramas y acuerdos del equipo en `CLAUDE.md`.
-- **App PR #2** `feature/fotos-medicos`: fotos públicas de profesionales en la reserva y en el detalle de la cita.
+- **App PR #2** `feature/fotos-medicos`: fotos públicas de profesionales en la reserva y en el detalle de la cita, más el arreglo de accesibilidad de los filtros.
 - **Backend** `feature/notificaciones-push` (D1, migración V17): dispositivos push y recordatorios de cita, con la tarea apagada por defecto y solo un envío simulado en dev/test.
 - **Este informe:** rama `chore/informe-final`, con su PR hacia `desarrollo` cuando se apruebe.
 
