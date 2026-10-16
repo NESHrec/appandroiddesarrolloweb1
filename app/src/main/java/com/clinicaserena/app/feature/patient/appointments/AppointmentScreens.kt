@@ -20,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.PrimaryTabRow
@@ -41,6 +40,7 @@ import com.clinicaserena.app.core.ui.FailureContent
 import com.clinicaserena.app.core.ui.LoadState
 import com.clinicaserena.app.core.ui.components.EmptyState
 import com.clinicaserena.app.core.ui.components.LoadingState
+import com.clinicaserena.app.core.ui.components.SelectableFilterChip
 import com.clinicaserena.app.core.ui.components.StatusBanner
 import com.clinicaserena.app.core.ui.theme.LocalStatusColors
 import com.clinicaserena.app.domain.model.AppointmentStatus
@@ -140,10 +140,10 @@ fun AppointmentListScreen(
                         AppointmentStatus.CANCELADA to R.string.cita_estado_cancelada,
                     )
                     filters.forEach { (status, label) ->
-                        FilterChip(
+                        SelectableFilterChip(
                             selected = state.statusFilter == status,
+                            label = stringResource(label),
                             onClick = { viewModel.selectStatus(status) },
-                            label = { Text(stringResource(label)) },
                             modifier = Modifier.testTag("filter_${status?.name ?: "TODOS"}"),
                         )
                     }

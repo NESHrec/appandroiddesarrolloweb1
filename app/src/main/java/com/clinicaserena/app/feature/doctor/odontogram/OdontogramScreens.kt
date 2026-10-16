@@ -8,13 +8,10 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -22,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.error
@@ -38,6 +34,7 @@ import com.clinicaserena.app.core.ui.UserMessage
 import com.clinicaserena.app.core.ui.asString
 import com.clinicaserena.app.core.ui.components.EmptyState
 import com.clinicaserena.app.core.ui.components.LoadingState
+import com.clinicaserena.app.core.ui.components.SelectableFilterChip
 import com.clinicaserena.app.core.ui.components.StatusBanner
 import com.clinicaserena.app.core.ui.theme.LocalStatusColors
 import com.clinicaserena.app.domain.model.AttentionBlocker
@@ -283,7 +280,7 @@ private fun ObservationForm(state: ObservationFormUiState, viewModel: Observatio
             FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 teeth.forEach { tooth ->
                     val description = stringResource(R.string.odontograma_pieza, tooth)
-                    SelectableChip(
+                    SelectableFilterChip(
                         selected = state.tooth == tooth,
                         label = tooth.toString(),
                         onClick = { viewModel.selectTooth(tooth) },
@@ -298,7 +295,7 @@ private fun ObservationForm(state: ObservationFormUiState, viewModel: Observatio
     FieldError(state.surfaceError, "observation_surface_error")
     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
         ToothSurface.entries.forEach { surface ->
-            SelectableChip(
+            SelectableFilterChip(
                 selected = state.surface == surface,
                 label = stringResource(surface.labelRes()),
                 onClick = { viewModel.selectSurface(surface) },
@@ -314,22 +311,6 @@ private fun ObservationForm(state: ObservationFormUiState, viewModel: Observatio
     Button(onClick = viewModel::review, modifier = Modifier.fillMaxWidth().testTag("observation_review")) {
         Text(stringResource(R.string.atencion_revisar))
     }
-}
-
-/** Chip con marca visible al elegirlo: el estado no depende solo del color. */
-@Composable
-private fun SelectableChip(selected: Boolean, label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    FilterChip(
-        selected = selected,
-        onClick = onClick,
-        label = { Text(label) },
-        leadingIcon = if (selected) {
-            { Icon(painterResource(R.drawable.ic_check_circle), contentDescription = null, modifier = Modifier.size(16.dp)) }
-        } else {
-            null
-        },
-        modifier = modifier,
-    )
 }
 
 @Composable
