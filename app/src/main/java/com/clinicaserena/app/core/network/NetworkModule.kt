@@ -32,6 +32,17 @@ object NetworkModule {
         .apply { extraInterceptors.forEach(::addInterceptor) }
         .build()
 
+    /**
+     * Cliente para recursos públicos que no pasan por Retrofit (fotos de profesionales). No lleva
+     * [AuthInterceptor]: sin `@PublicEndpoint`, ese interceptor agregaría el Bearer a cualquier petición.
+     */
+    fun publicOkHttpClient(extraInterceptors: List<Interceptor> = emptyList()): OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .apply { extraInterceptors.forEach(::addInterceptor) }
+        .build()
+
     fun retrofit(baseUrl: String, client: OkHttpClient): Retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
         .client(client)

@@ -1,5 +1,12 @@
 package com.clinicaserena.app.feature.patient.booking
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.Alignment
+import com.clinicaserena.app.core.ui.components.PractitionerAvatar
+import com.clinicaserena.app.domain.model.Practitioner
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -125,6 +132,7 @@ private fun PractitionerStep(state: BookingUiState, viewModel: BookingViewModel)
                     subtitle = practitioner.specialtyName,
                     testTag = "practitioner_${practitioner.id}",
                     onClick = { viewModel.selectPractitioner(practitioner) },
+                    leading = { PractitionerAvatar(practitioner.fullName, practitioner.photoUrl, 48.dp) },
                 )
             }
         }
@@ -180,7 +188,7 @@ private fun ConfirmStep(state: BookingUiState, viewModel: BookingViewModel) {
     ) {
         Column(Modifier.padding(16.dp)) {
             state.specialty?.let { InfoRow(stringResource(R.string.cita_especialidad), it.name) }
-            state.practitioner?.let { InfoRow(stringResource(R.string.cita_medico), it.fullName) }
+            state.practitioner?.let { PractitionerSummaryRow(it) }
             InfoRow(stringResource(R.string.cita_fecha_hora), ClinicTime.formatDateTime(slot.startAt))
             InfoRow(stringResource(R.string.reserva_duracion), slotRange(slot))
         }
@@ -242,7 +250,7 @@ private fun DoneStep(state: BookingUiState, onViewAppointments: () -> Unit, onEx
     ) {
         Column(Modifier.padding(16.dp)) {
             state.specialty?.let { InfoRow(stringResource(R.string.cita_especialidad), it.name) }
-            state.practitioner?.let { InfoRow(stringResource(R.string.cita_medico), it.fullName) }
+            state.practitioner?.let { PractitionerSummaryRow(it) }
             InfoRow(stringResource(R.string.cita_fecha_hora), ClinicTime.formatDateTime(booked.scheduledAt))
             booked.notes?.takeIf { it.isNotBlank() }?.let { InfoRow(stringResource(R.string.cita_notas), it) }
         }
@@ -256,7 +264,13 @@ private fun DoneStep(state: BookingUiState, onViewAppointments: () -> Unit, onEx
 }
 
 @Composable
-private fun ChoiceCard(title: String, subtitle: String?, testTag: String, onClick: () -> Unit) {
+private fun ChoiceCard(
+    title: String,
+    subtitle: String?,
+    testTag: String,
+    onClick: () -> Unit,
+    leading: (@Composable () -> Unit)? = null,
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -264,12 +278,28 @@ private fun ChoiceCard(title: String, subtitle: String?, testTag: String, onClic
             .clickable(role = Role.Button, onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
-        Column(Modifier.padding(16.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            subtitle?.takeIf { it.isNotBlank() }?.let {
-                Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            leading?.let {
+                it()
+                Spacer(Modifier.width(12.dp))
+            }
+            Column(Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.titleMedium)
+                subtitle?.takeIf { it.isNotBlank() }?.let {
+                    Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
         }
+    }
+}
+
+/** Fila «Médico» del resumen con su foto pública (o iniciales). */
+@Composable
+private fun PractitionerSummaryRow(practitioner: Practitioner) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
+        PractitionerAvatar(practitioner.fullName, practitioner.photoUrl, 64.dp)
+        Spacer(Modifier.width(12.dp))
+        Box(Modifier.weight(1f)) { InfoRow(stringResource(R.string.cita_medico), practitioner.fullName) }
     }
 }
 

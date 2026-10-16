@@ -238,6 +238,7 @@ $ANDROID_HOME/build-tools/36.0.0/apksigner verify --print-certs app/build/output
 - **Sesión:** el token Bearer se guarda cifrado con Android Keystore (AES-GCM) en DataStore. No sale en los respaldos (`allowBackup=false` y reglas de extracción).
 - **Registro HTTP:** solo en debug, nivel BASIC, sin cabeceras ni cuerpos. Release y qaLocal no incluyen el interceptor.
 - **Datos clínicos:** se muestran desde memoria y se borran al cerrar sesión. No hay caché persistente.
+- **Fotos públicas de profesionales** (no clínicas): se descargan sin Bearer, desde el mismo servidor de la API, y se guardan solo en memoria. La caché se vacía al cerrar o vencer la sesión y nunca se escribe en disco (el servidor responde `no-store`).
 - **Autorización:** la app no autoriza nada con IDs de la UI; Spring valida cada operación. Todo recurso de otro médico responde 404.
 - **APK y secretos:** no se suben al repositorio APK, `.env`, keystores, `.properties` de firma ni informes locales.
 
