@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Solo debug: herramientas de prueba de sesión. -->
+    <string name="debug_simular_vencida">Simular sesión vencida (solo debug)</string>
+</resources>

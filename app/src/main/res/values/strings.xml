@@ -104,7 +104,6 @@
     <string name="diagnostico_url">API: %1$s</string>
     <string name="diagnostico_ok">Backend disponible (%1$s)</string>
     <string name="diagnostico_verificando">Consultando /health…</string>
-    <string name="debug_simular_vencida">Simular sesión vencida (solo debug)</string>
 
     <!-- Navegación PACIENTE -->
     <string name="nav_inicio">Inicio</string>

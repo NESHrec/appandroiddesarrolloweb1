@@ -35,3 +35,7 @@ cuentas-prueba.env
 
 # Sistema operativo
 .DS_Store
+
+# Firma fuera del repo (protección adicional)
+signing*.properties
+/firma/
