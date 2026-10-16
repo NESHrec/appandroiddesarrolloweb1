@@ -50,6 +50,13 @@
 - Verificado en vivo (C3): las observaciones de odontograma solo se aceptan mientras la cita es documentable (iniciada, con llegada y sin atención); sobre una cita completada → 409 APPOINTMENT_NOT_DOCUMENTABLE sin efectos. Médico 2: odontograma del Paciente 1 → 404 PATIENT_NOT_FOUND; adenda a la atención de la cita A → 404 APPOINTMENT_NOT_FOUND (la cita se valida antes que la atención); observación sobre una cita ajena → 404 PATIENT_NOT_FOUND. La adenda que agrega el médico la ve el paciente en /pacientes/me/expediente.
 - Cuentas de prueba: además de paciente, ADMIN, médico y recepción, existen Paciente 2 (registrado desde la app en B1) y Médico 2 (vinculado a Dr. Mateo Rivera, Ortodoncia; tiene una cita de Paciente 2 el 10/10 a las 11:00).
 
+## Estado del backend (revisado el 15/10/2026)
+- `desarrollo` en `7fa072d` ("feat: gestionar profesionales y fotos"). Las ramas remotas `feature/ui-security-*` e `integration/ui-security` apuntan al mismo commit; no hay trabajo sin fusionar.
+- Migraciones Flyway aplicadas hasta V16: V14 (bitácora con actor paciente o personal, solicitudes de vinculación de pacientes, retiro de bloques), V15 (médicos activos o inactivos y foto), V16 (número de colegiado único normalizado). **Siguiente migración libre: V17**; coordinar el número entre las ramas paralelas para evitar choques.
+- Endpoints nuevos que la app no usa: `GET /medicos/{id}/foto` (público), `PATCH` y `DELETE /staff/medico/horarios/{blockId}` (MEDICO: editar o retirar bloques), `/staff/medicos/**` (ADMIN).
+- Cambios de comportamiento ya compatibles con la app: `/medicos` y la disponibilidad excluyen médicos inactivos y bloques retirados; `PractitionerDto` trae `active` y `photoUrl` (la app ignora claves desconocidas); auditoría en reserva, atención, adenda, perfil clínico y odontograma, sin cambios en los contratos.
+- Matriz completa endpoint → pantalla → rol → errores: `docs/matriz-endpoints.md`. Instalación y solución de problemas: `README.md`.
+
 ## Compilación y SDK (Fase E1a)
 - compileSdk 37 y targetSdk 36. Subir targetSdk a 37 queda PENDIENTE hasta probar la app en un dispositivo con Android 17 (API 37): con target 37, Android 17 exige ACCESS_LOCAL_NETWORK para la red local (10.0.0.0/8 incluye 10.0.2.2) y activa Certificate Transparency por defecto.
 - El emulador API 37 no arranca en esta Mac: el AVD Pixel_9_Pro_XL_API_37 quedó con target=android-0 porque las cmdline-tools 19.0 no leen la imagen 37.0 (XML de SDK v4). Alternativa: Pixel 9 Pro XL físico con `adb reverse tcp:8080 tcp:8080` y `-PclinicaSerena.debugApiBaseUrl=http://localhost:8080/api/v1/`.
