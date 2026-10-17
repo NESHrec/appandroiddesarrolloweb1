@@ -12,12 +12,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -47,7 +45,7 @@ fun LoadingState(modifier: Modifier = Modifier, message: String = stringResource
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        CircularProgressIndicator()
+        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         Spacer(Modifier.size(16.dp))
         Text(
             text = message,
@@ -139,7 +137,7 @@ fun SuccessBanner(message: String, modifier: Modifier = Modifier) {
     )
 }
 
-/** Aviso en línea (dentro de una pantalla), con icono y texto. */
+/** Aviso en línea (dentro de una pantalla): ícono, título y texto del tono del fondo. */
 @Composable
 fun StatusBanner(
     @DrawableRes iconRes: Int,
@@ -148,17 +146,17 @@ fun StatusBanner(
     background: Color,
     modifier: Modifier = Modifier,
 ) {
-    Card(
+    val content = LocalStatusColors.current.contentFor(background)
+    Surface(
         modifier = modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
-        colors = CardDefaults.cardColors(
-            containerColor = background,
-            contentColor = LocalStatusColors.current.onStatus,
-        ),
+        shape = MaterialTheme.shapes.medium,
+        color = background,
+        contentColor = content,
     ) {
-        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
-            Icon(painterResource(iconRes), contentDescription = null, modifier = Modifier.size(24.dp))
+        Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.Top) {
+            Icon(painterResource(iconRes), contentDescription = null, modifier = Modifier.size(22.dp))
             Spacer(Modifier.width(12.dp))
-            Column {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(title, style = MaterialTheme.typography.titleSmall)
                 Text(message, style = MaterialTheme.typography.bodyMedium)
             }
@@ -189,12 +187,11 @@ private fun StatusPanel(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Card(
+        Surface(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = background,
-                contentColor = LocalStatusColors.current.onStatus,
-            ),
+            shape = MaterialTheme.shapes.large,
+            color = background,
+            contentColor = LocalStatusColors.current.contentFor(background),
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(24.dp),
@@ -211,13 +208,13 @@ private fun StatusPanel(
                 Spacer(Modifier.size(8.dp))
                 Text(
                     text = message,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
                 )
                 if (actionLabel != null && onAction != null) {
                     Spacer(Modifier.size(16.dp))
-                    Button(onClick = onAction) { Text(actionLabel) }
+                    PrimaryButton(text = actionLabel, onClick = onAction)
                 }
             }
         }

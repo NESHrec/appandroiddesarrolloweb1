@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavBackStackEntry
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
@@ -15,6 +15,11 @@ import com.clinicaserena.app.core.ui.LocalAppContainer
 import com.clinicaserena.app.feature.common.RoleNavScaffold
 import com.clinicaserena.app.feature.common.TopLevelDestination
 import com.clinicaserena.app.feature.doctor.agenda.DoctorAgendaScreen
+import com.clinicaserena.app.feature.doctor.agenda.DoctorAgendaViewModel
+import com.clinicaserena.app.feature.doctor.agenda.DoctorAppointmentDetailScreen
+import com.clinicaserena.app.feature.doctor.agenda.DoctorAppointmentViewModel
+import com.clinicaserena.app.feature.doctor.agenda.DoctorHomeScreen
+import com.clinicaserena.app.feature.doctor.agenda.DoctorHomeViewModel
 import com.clinicaserena.app.feature.doctor.care.AddendumFormScreen
 import com.clinicaserena.app.feature.doctor.care.AddendumFormViewModel
 import com.clinicaserena.app.feature.doctor.care.AttentionFormScreen
@@ -23,11 +28,6 @@ import com.clinicaserena.app.feature.doctor.care.ClinicalProfileFormScreen
 import com.clinicaserena.app.feature.doctor.care.ClinicalProfileFormViewModel
 import com.clinicaserena.app.feature.doctor.care.DoctorRecordScreen
 import com.clinicaserena.app.feature.doctor.care.DoctorRecordViewModel
-import com.clinicaserena.app.feature.doctor.agenda.DoctorAgendaViewModel
-import com.clinicaserena.app.feature.doctor.agenda.DoctorAppointmentDetailScreen
-import com.clinicaserena.app.feature.doctor.agenda.DoctorAppointmentViewModel
-import com.clinicaserena.app.feature.doctor.agenda.DoctorHomeScreen
-import com.clinicaserena.app.feature.doctor.agenda.DoctorHomeViewModel
 import com.clinicaserena.app.feature.doctor.odontogram.ObservationFormScreen
 import com.clinicaserena.app.feature.doctor.odontogram.ObservationFormViewModel
 import com.clinicaserena.app.feature.doctor.odontogram.OdontogramScreen
@@ -48,9 +48,9 @@ import kotlinx.serialization.Serializable
 @Serializable data class ObservationFormRoute(val appointmentId: String, val patientId: String)
 
 private val doctorDestinations = listOf(
-    TopLevelDestination(DoctorHomeRoute, R.string.nav_inicio, R.drawable.ic_home),
-    TopLevelDestination(DoctorAgendaRoute, R.string.nav_agenda, R.drawable.ic_calendar),
-    TopLevelDestination(DoctorProfileRoute, R.string.nav_perfil, R.drawable.ic_person),
+    TopLevelDestination(DoctorHomeRoute, R.string.nav_inicio, R.drawable.ic_home, R.drawable.ic_home_outline),
+    TopLevelDestination(DoctorAgendaRoute, R.string.nav_agenda, R.drawable.ic_calendar, R.drawable.ic_calendar_outline),
+    TopLevelDestination(DoctorProfileRoute, R.string.nav_perfil, R.drawable.ic_person, R.drawable.ic_person_outline),
 )
 
 /** Navegación del MEDICO: Inicio, Agenda, Perfil y el detalle de cada cita propia. */

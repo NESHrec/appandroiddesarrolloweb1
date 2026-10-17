@@ -1,12 +1,14 @@
 package com.clinicaserena.app
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -22,6 +24,7 @@ import com.clinicaserena.app.core.ui.ScopedViewModels
 import com.clinicaserena.app.core.ui.asString
 import com.clinicaserena.app.core.ui.components.ErrorState
 import com.clinicaserena.app.core.ui.components.LoadingState
+import com.clinicaserena.app.core.ui.components.SerenaBackground
 import com.clinicaserena.app.core.ui.theme.ClinicaSerenaTheme
 import com.clinicaserena.app.core.ui.toUserMessage
 import com.clinicaserena.app.domain.model.Role
@@ -35,18 +38,22 @@ import com.clinicaserena.app.feature.patient.PatientNavHost
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
+        // Barras del sistema transparentes sobre el fondo de la app: íconos oscuros en día y claros en
+        // noche (siguen el modo del sistema, igual que el tema).
+        val systemBars = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
+        enableEdgeToEdge(statusBarStyle = systemBars, navigationBarStyle = systemBars)
         super.onCreate(savedInstanceState)
         val container = (application as ClinicaSerenaApp).container
         setContent {
             ClinicaSerenaTheme {
                 CompositionLocalProvider(LocalAppContainer provides container) {
-                    Surface(
+                    SerenaBackground(
                         // testTagsAsResourceId: permite ubicar elementos con `uiautomator dump` en el emulador.
                         modifier = Modifier.fillMaxSize().semantics { testTagsAsResourceId = true },
-                        color = MaterialTheme.colorScheme.background,
                     ) {
-                        AppRoot(container)
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onBackground) {
+                            AppRoot(container)
+                        }
                     }
                 }
             }

@@ -6,15 +6,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -33,7 +29,11 @@ import com.clinicaserena.app.core.ui.LoadState
 import com.clinicaserena.app.core.ui.UserMessage
 import com.clinicaserena.app.core.ui.asString
 import com.clinicaserena.app.core.ui.components.EmptyState
+import com.clinicaserena.app.core.ui.components.GroupedSectionHeader
+import com.clinicaserena.app.core.ui.components.HairlineDivider
+import com.clinicaserena.app.core.ui.components.LinkButton
 import com.clinicaserena.app.core.ui.components.LoadingState
+import com.clinicaserena.app.core.ui.components.PrimaryButton
 import com.clinicaserena.app.core.ui.components.SelectableFilterChip
 import com.clinicaserena.app.core.ui.components.StatusBanner
 import com.clinicaserena.app.core.ui.theme.LocalStatusColors
@@ -90,14 +90,11 @@ fun OdontogramScreen(viewModel: OdontogramViewModel, onBack: () -> Unit, onAddOb
                     val content = load.data
                     content.odontogram.patientName?.let { InfoRow(stringResource(R.string.medico_paciente), it) }
                     AddObservationSection(content.appointment, onAddObservation)
-                    Text(
-                        stringResource(R.string.odontograma_historial),
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.semantics { heading() },
-                    )
+                    GroupedSectionHeader(stringResource(R.string.odontograma_historial))
                     Text(
                         stringResource(R.string.odontograma_aviso_historial),
                         style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.testTag("odontogram_history_notice"),
                     )
                     if (content.history.isEmpty()) {
@@ -106,7 +103,7 @@ fun OdontogramScreen(viewModel: OdontogramViewModel, onBack: () -> Unit, onAddOb
                         Dentition.entries.forEach { dentition ->
                             val teeth = content.history.filter { it.dentition == dentition }
                             if (teeth.isNotEmpty()) {
-                                SectionTitle(
+                                GroupedSectionHeader(
                                     stringResource(if (dentition == Dentition.PERMANENT) R.string.odontograma_permanente else R.string.odontograma_temporal),
                                 )
                                 teeth.forEach { ToothCard(it, content.appointment.id) }
@@ -146,11 +143,12 @@ private fun AddObservationSection(appointment: DoctorAppointment, onAddObservati
             modifier = Modifier.testTag("odontogram_blocked"),
         )
     }
-    Button(
+    PrimaryButton(
+        text = stringResource(R.string.odontograma_agregar),
         onClick = onAddObservation,
         enabled = appointment.canRecordAttention,
-        modifier = Modifier.fillMaxWidth().testTag("odontogram_add"),
-    ) { Text(stringResource(R.string.odontograma_agregar)) }
+        modifier = Modifier.testTag("odontogram_add"),
+    )
 }
 
 @Composable
@@ -158,7 +156,7 @@ private fun ToothCard(tooth: ToothHistory, currentAppointmentId: String) {
     ClinicalCard(testTag = "odontogram_tooth_${tooth.toothNumber}") {
         SectionTitle(stringResource(R.string.odontograma_pieza, tooth.toothNumber))
         tooth.surfaces.forEachIndexed { index, surface ->
-            if (index > 0) HorizontalDivider()
+            if (index > 0) HairlineDivider()
             Text(
                 surface.surface?.let { stringResource(it.labelRes()) }
                     ?: surface.surfaceRaw
@@ -232,9 +230,12 @@ fun ObservationFormScreen(viewModel: ObservationFormViewModel, onExit: () -> Uni
                         onClick = viewModel::submit,
                         testTag = "observation_confirm",
                     )
-                    TextButton(onClick = viewModel::backToForm, enabled = !state.submitting, modifier = Modifier.testTag("observation_edit")) {
-                        Text(stringResource(R.string.atencion_volver_a_editar))
-                    }
+                    LinkButton(
+                        text = stringResource(R.string.atencion_volver_a_editar),
+                        onClick = viewModel::backToForm,
+                        enabled = !state.submitting,
+                        modifier = Modifier.testTag("observation_edit"),
+                    )
                     DebugSessionTools()
                 }
                 FormStep.DONE -> {
@@ -245,9 +246,11 @@ fun ObservationFormScreen(viewModel: ObservationFormViewModel, onExit: () -> Uni
                         background = LocalStatusColors.current.success,
                         modifier = Modifier.testTag("observation_done"),
                     )
-                    Button(onClick = onDone, modifier = Modifier.fillMaxWidth().testTag("observation_back")) {
-                        Text(stringResource(R.string.odontograma_volver))
-                    }
+                    PrimaryButton(
+                        text = stringResource(R.string.odontograma_volver),
+                        onClick = onDone,
+                        modifier = Modifier.testTag("observation_back"),
+                    )
                 }
             }
         }
@@ -259,7 +262,7 @@ fun ObservationFormScreen(viewModel: ObservationFormViewModel, onExit: () -> Uni
 private fun ObservationForm(state: ObservationFormUiState, viewModel: ObservationFormViewModel) {
     state.error?.let { ErrorNotice(it, "observation_form_error") }
 
-    Text(stringResource(R.string.odontograma_elige_pieza), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+    GroupedSectionHeader(stringResource(R.string.odontograma_elige_pieza))
     Text(
         state.tooth?.let { stringResource(R.string.odontograma_pieza_elegida, it) } ?: stringResource(R.string.odontograma_ninguna_pieza),
         style = MaterialTheme.typography.bodyMedium,
@@ -291,7 +294,7 @@ private fun ObservationForm(state: ObservationFormUiState, viewModel: Observatio
         }
     }
 
-    Text(stringResource(R.string.odontograma_elige_superficie), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+    GroupedSectionHeader(stringResource(R.string.odontograma_elige_superficie))
     FieldError(state.surfaceError, "observation_surface_error")
     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
         ToothSurface.entries.forEach { surface ->
@@ -308,9 +311,11 @@ private fun ObservationForm(state: ObservationFormUiState, viewModel: Observatio
         state.observation, viewModel::onObservationChange, stringResource(R.string.odontograma_observacion),
         ObservationFormViewModel.MAX, state.observationError, "observation_text",
     )
-    Button(onClick = viewModel::review, modifier = Modifier.fillMaxWidth().testTag("observation_review")) {
-        Text(stringResource(R.string.atencion_revisar))
-    }
+    PrimaryButton(
+        text = stringResource(R.string.atencion_revisar),
+        onClick = viewModel::review,
+        modifier = Modifier.testTag("observation_review"),
+    )
 }
 
 @Composable

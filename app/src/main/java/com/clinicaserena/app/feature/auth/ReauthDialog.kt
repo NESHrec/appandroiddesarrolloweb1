@@ -10,12 +10,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,8 +33,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.clinicaserena.app.R
 import com.clinicaserena.app.core.ui.LocalAppContainer
 import com.clinicaserena.app.core.ui.asString
+import com.clinicaserena.app.core.ui.components.LinkButton
 import com.clinicaserena.app.core.ui.components.PasswordField
 import com.clinicaserena.app.core.ui.components.StatusBanner
+import com.clinicaserena.app.core.ui.theme.LocalSerenaColors
 import com.clinicaserena.app.core.ui.theme.LocalStatusColors
 import kotlinx.coroutines.launch
 
@@ -55,20 +55,27 @@ fun ReauthDialog(email: String) {
         onDismissRequest = {},
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
     ) {
-        Card(
+        Surface(
             // El Dialog es otra ventana: necesita su propio testTagsAsResourceId para `uiautomator`.
             modifier = Modifier
                 .fillMaxWidth()
                 .semantics { testTagsAsResourceId = true }
                 .testTag("reauth_dialog"),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            shape = MaterialTheme.shapes.large,
+            color = LocalSerenaColors.current.card,
+            contentColor = LocalSerenaColors.current.text,
         ) {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()).padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(painterResource(R.drawable.ic_schedule), contentDescription = null, modifier = Modifier.size(28.dp))
+                    Icon(
+                        painterResource(R.drawable.ic_schedule),
+                        contentDescription = null,
+                        tint = LocalStatusColors.current.warningTone.content,
+                        modifier = Modifier.size(28.dp),
+                    )
                     Spacer(Modifier.width(12.dp))
                     Text(
                         stringResource(R.string.estado_sesion_vencida_titulo),
@@ -77,7 +84,11 @@ fun ReauthDialog(email: String) {
                     )
                 }
                 Text(stringResource(R.string.reauth_mensaje), style = MaterialTheme.typography.bodyMedium)
-                Text(stringResource(R.string.reauth_cuenta, email), style = MaterialTheme.typography.bodySmall)
+                Text(
+                    stringResource(R.string.reauth_cuenta, email),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 PasswordField(
                     value = state.password,
                     onValueChange = viewModel::onPasswordChange,
@@ -103,13 +114,12 @@ fun ReauthDialog(email: String) {
                     onClick = viewModel::submit,
                     testTag = "reauth_submit",
                 )
-                TextButton(
+                LinkButton(
+                    text = stringResource(R.string.reauth_salir),
                     onClick = { scope.launch { container.sessionManager.abandonExpiredSession() } },
                     enabled = !state.submitting,
                     modifier = Modifier.testTag("reauth_logout"),
-                ) {
-                    Text(stringResource(R.string.reauth_salir))
-                }
+                )
             }
         }
     }

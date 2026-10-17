@@ -33,7 +33,7 @@
 8. Toda pantalla con datos maneja estos estados: carga, vacío, error recuperable, sesión vencida, permiso denegado y éxito. Textos en español.
 9. Mostrar éxito solo después de una respuesta exitosa de Spring.
 10. URL base por BuildConfig. Debug: `http://10.0.2.2:8080/api/v1`, con cleartext permitido SOLO en debug. Release: HTTPS.
-11. Paleta: principal `#62727B`, fondo `#F6FAFA`, turquesa `#DDF3F1`, amarillo `#F8EDD2`, verde `#E5F1D8`, rosa `#F8E2E8`, texto `#17232B`, superficie `#FFFFFF`. No comunicar estados solo con color.
+11. Paleta (rediseño «vivo», 16/10/2026; la app sigue el modo día/noche del sistema, sin interruptor ni preferencia guardada). Degradado `#2563EB`→`#7C3AED` (alterno `#0F7395`→`#2563EB`) con texto blanco, igual en día y noche. Día: fondo `#F4F6FB` con manchas suaves, tarjetas `#FFFFFF`, texto `#141B2D`, secundario `#5A6478`, enlaces `#2563EB`, separadores `#E3E7EF`. Noche: fondo `#0B1020` con manchas `#1D4ED8`, `#0F766E` y `#6D28D9` a alfa bajo, tarjetas `#161D2E`, separadores `#252E42`, texto `#EEF2FA`, secundario `#A3ADC2`, enlaces `#60A5FA`. Estados: Pendiente ámbar, Confirmada verde, Completada turquesa, Cancelada rosa, Llegada violeta (tokens en `core/ui/theme`). Contraste mínimo 4.5:1 en texto y 3:1 en íconos, en día y en noche. No comunicar estados solo con color.
 12. Nada está terminado solo porque compila. Probar el recorrido contra el backend real.
 
 ## Entorno local verificado (Fase A1)

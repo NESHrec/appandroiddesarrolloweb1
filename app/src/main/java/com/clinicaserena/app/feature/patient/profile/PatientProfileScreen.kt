@@ -2,18 +2,12 @@ package com.clinicaserena.app.feature.patient.profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -31,7 +25,10 @@ import com.clinicaserena.app.core.ui.FailureContent
 import com.clinicaserena.app.core.ui.LoadState
 import com.clinicaserena.app.core.ui.asString
 import com.clinicaserena.app.core.ui.components.FormTextField
+import com.clinicaserena.app.core.ui.components.GroupedCard
+import com.clinicaserena.app.core.ui.components.LinkButton
 import com.clinicaserena.app.core.ui.components.LoadingState
+import com.clinicaserena.app.core.ui.components.SecondaryButton
 import com.clinicaserena.app.core.ui.components.StatusBanner
 import com.clinicaserena.app.core.ui.theme.LocalStatusColors
 import com.clinicaserena.app.feature.auth.SubmitButton
@@ -40,6 +37,7 @@ import com.clinicaserena.app.feature.common.InfoRow
 import com.clinicaserena.app.feature.common.LogoutSection
 
 /** Mi perfil: datos de la cuenta, cambio de nombre y cierre de sesión. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PatientProfileScreen(viewModel: PatientProfileViewModel, onBack: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -50,7 +48,7 @@ fun PatientProfileScreen(viewModel: PatientProfileViewModel, onBack: () -> Unit)
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             when (val current = state.load) {
@@ -67,10 +65,7 @@ fun PatientProfileScreen(viewModel: PatientProfileViewModel, onBack: () -> Unit)
                             modifier = Modifier.testTag("profile_saved"),
                         )
                     }
-                    Card(
-                        modifier = Modifier.fillMaxWidth().testTag("profile_card"),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    ) {
+                    GroupedCard(modifier = Modifier.testTag("profile_card")) {
                         Column(Modifier.padding(16.dp)) {
                             InfoRow(stringResource(R.string.perfil_nombre), profile.fullName)
                             InfoRow(stringResource(R.string.perfil_correo), profile.email)
@@ -86,13 +81,20 @@ fun PatientProfileScreen(viewModel: PatientProfileViewModel, onBack: () -> Unit)
                     if (state.editing) {
                         NameEditor(state, viewModel)
                     } else {
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedButton(onClick = viewModel::startEditing, modifier = Modifier.testTag("profile_edit_name")) {
-                                Text(stringResource(R.string.perfil_cambiar_nombre))
-                            }
-                            OutlinedButton(onClick = viewModel::load, modifier = Modifier.testTag("profile_refresh")) {
-                                Text(stringResource(R.string.perfil_actualizar))
-                            }
+                        // FlowRow: con letra grande o pantalla pequeña el segundo botón baja de línea.
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            SecondaryButton(
+                                text = stringResource(R.string.perfil_cambiar_nombre),
+                                onClick = viewModel::startEditing,
+                                fillWidth = false,
+                                modifier = Modifier.testTag("profile_edit_name"),
+                            )
+                            SecondaryButton(
+                                text = stringResource(R.string.perfil_actualizar),
+                                onClick = viewModel::load,
+                                fillWidth = false,
+                                modifier = Modifier.testTag("profile_refresh"),
+                            )
                         }
                     }
                 }
@@ -140,7 +142,10 @@ private fun NameEditor(state: PatientProfileUiState, viewModel: PatientProfileVi
         onClick = viewModel::save,
         testTag = "profile_save_name",
     )
-    TextButton(onClick = viewModel::cancelEditing, enabled = !state.saving) {
-        Text(stringResource(R.string.perfil_cancelar))
-    }
+    LinkButton(
+        text = stringResource(R.string.perfil_cancelar),
+        onClick = viewModel::cancelEditing,
+        enabled = !state.saving,
+        muted = true,
+    )
 }

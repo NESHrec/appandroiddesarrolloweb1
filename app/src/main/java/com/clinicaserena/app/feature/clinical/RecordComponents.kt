@@ -2,11 +2,10 @@ package com.clinicaserena.app.feature.clinical
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +17,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.clinicaserena.app.R
 import com.clinicaserena.app.core.time.ClinicTime
+import com.clinicaserena.app.core.ui.components.GroupedCard
+import com.clinicaserena.app.core.ui.components.HairlineDivider
+import com.clinicaserena.app.core.ui.components.InfoTag
 import com.clinicaserena.app.domain.model.Attention
 import com.clinicaserena.app.domain.model.ClinicalProfile
 import com.clinicaserena.app.domain.model.PrescriptionItem
@@ -29,6 +31,7 @@ import com.clinicaserena.app.feature.common.InfoRow
  */
 
 /** Ítems en orden: medicamento, dosis, frecuencia, duración e instrucciones. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PrescriptionItems(items: List<PrescriptionItem>) {
     if (items.isEmpty()) {
@@ -36,13 +39,17 @@ fun PrescriptionItems(items: List<PrescriptionItem>) {
         return
     }
     items.forEachIndexed { index, item ->
-        if (index > 0) HorizontalDivider()
-        Column(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-            Text("${item.order}. ${item.medicine}", style = MaterialTheme.typography.titleSmall)
-            Text(
-                stringResource(R.string.receta_item_detalle, item.dose, item.frequency, item.duration),
-                style = MaterialTheme.typography.bodyMedium,
-            )
+        if (index > 0) HairlineDivider()
+        Column(Modifier.fillMaxWidth().padding(vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text("${item.order}. ${item.medicine}", style = MaterialTheme.typography.titleMedium)
+            // Dosis, frecuencia y duración como etiquetas; TalkBack las lee juntas, en el mismo orden.
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.semantics(mergeDescendants = true) {},
+            ) {
+                listOf(item.dose, item.frequency, item.duration).filter { it.isNotBlank() }.forEach { InfoTag(it) }
+            }
             item.instructions?.takeIf { it.isNotBlank() }?.let {
                 Text(
                     stringResource(R.string.receta_instrucciones, it),
@@ -89,7 +96,7 @@ fun AttentionCard(attention: Attention) {
         Text(stringResource(R.string.expediente_receta), style = MaterialTheme.typography.titleSmall)
         PrescriptionItems(attention.prescription)
         if (attention.addenda.isNotEmpty()) {
-            HorizontalDivider()
+            HairlineDivider()
             Text(stringResource(R.string.expediente_adendas), style = MaterialTheme.typography.titleSmall)
             attention.addenda.forEach { addendum ->
                 Column(Modifier.padding(vertical = 4.dp)) {
@@ -125,10 +132,7 @@ fun AttentionCard(attention: Attention) {
 
 @Composable
 fun ClinicalCard(testTag: String? = null, content: @Composable () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth().then(if (testTag != null) Modifier.testTag(testTag) else Modifier),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
+    GroupedCard(modifier = if (testTag != null) Modifier.testTag(testTag) else Modifier) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { content() }
     }
 }

@@ -2,6 +2,7 @@ package com.clinicaserena.app.feature.doctor.care
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,21 +11,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.error
-import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
@@ -35,8 +30,15 @@ import com.clinicaserena.app.core.ui.LoadState
 import com.clinicaserena.app.core.ui.UserMessage
 import com.clinicaserena.app.core.ui.asString
 import com.clinicaserena.app.core.ui.components.EmptyState
+import com.clinicaserena.app.core.ui.components.FieldShape
+import com.clinicaserena.app.core.ui.components.GroupedCard
+import com.clinicaserena.app.core.ui.components.GroupedSectionHeader
+import com.clinicaserena.app.core.ui.components.LinkButton
 import com.clinicaserena.app.core.ui.components.LoadingState
+import com.clinicaserena.app.core.ui.components.PrimaryButton
+import com.clinicaserena.app.core.ui.components.SecondaryButton
 import com.clinicaserena.app.core.ui.components.StatusBanner
+import com.clinicaserena.app.core.ui.components.serenaFieldColors
 import com.clinicaserena.app.core.ui.theme.LocalStatusColors
 import com.clinicaserena.app.domain.model.PrescriptionItem
 import com.clinicaserena.app.feature.auth.SubmitButton
@@ -70,6 +72,8 @@ fun ClinicalTextField(
         supportingText = { Text(errorText ?: stringResource(R.string.reserva_notas_contador, value.length, max)) },
         singleLine = singleLine,
         enabled = enabled,
+        shape = FieldShape,
+        colors = serenaFieldColors(),
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         modifier = Modifier
             .fillMaxWidth()
@@ -142,9 +146,11 @@ fun AttentionFormScreen(viewModel: AttentionFormViewModel, onExit: () -> Unit, o
                         modifier = Modifier.testTag("attention_done"),
                     )
                     state.recorded?.let { AttentionCard(it) }
-                    Button(onClick = onDone, modifier = Modifier.fillMaxWidth().testTag("attention_back_to_appointment")) {
-                        Text(stringResource(R.string.atencion_volver_a_la_cita))
-                    }
+                    PrimaryButton(
+                        text = stringResource(R.string.atencion_volver_a_la_cita),
+                        onClick = onDone,
+                        modifier = Modifier.testTag("attention_back_to_appointment"),
+                    )
                 }
             }
         }
@@ -155,18 +161,17 @@ fun AttentionFormScreen(viewModel: AttentionFormViewModel, onExit: () -> Unit, o
 private fun AttentionForm(state: AttentionFormUiState, viewModel: AttentionFormViewModel) {
     val e = state.fieldErrors
     state.error?.let { ErrorNotice(it, "attention_form_error") }
-    ClinicalTextField(state.reason, viewModel::onReasonChange, stringResource(R.string.expediente_motivo), 1000, e["reason"], "attention_reason")
-    ClinicalTextField(state.findings, viewModel::onFindingsChange, stringResource(R.string.atencion_hallazgos_opcional), 2000, e["findings"], "attention_findings")
-    ClinicalTextField(state.diagnosis, viewModel::onDiagnosisChange, stringResource(R.string.expediente_diagnostico), 1000, e["diagnosis"], "attention_diagnosis")
-    ClinicalTextField(state.treatmentPlan, viewModel::onTreatmentPlanChange, stringResource(R.string.atencion_plan_opcional), 2000, e["treatmentPlan"], "attention_plan")
+    FieldGroup {
+        ClinicalTextField(state.reason, viewModel::onReasonChange, stringResource(R.string.expediente_motivo), 1000, e["reason"], "attention_reason")
+        ClinicalTextField(state.findings, viewModel::onFindingsChange, stringResource(R.string.atencion_hallazgos_opcional), 2000, e["findings"], "attention_findings")
+        ClinicalTextField(state.diagnosis, viewModel::onDiagnosisChange, stringResource(R.string.expediente_diagnostico), 1000, e["diagnosis"], "attention_diagnosis")
+        ClinicalTextField(state.treatmentPlan, viewModel::onTreatmentPlanChange, stringResource(R.string.atencion_plan_opcional), 2000, e["treatmentPlan"], "attention_plan")
+    }
 
-    Text(stringResource(R.string.atencion_receta_titulo, state.items.size, AttentionFormViewModel.MAX_ITEMS), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+    GroupedSectionHeader(stringResource(R.string.atencion_receta_titulo, state.items.size, AttentionFormViewModel.MAX_ITEMS))
     if (state.items.isEmpty()) Text(stringResource(R.string.atencion_sin_receta), style = MaterialTheme.typography.bodyMedium)
     state.items.forEachIndexed { index, item ->
-        Card(
-            modifier = Modifier.fillMaxWidth().testTag("attention_item_$index"),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        ) {
+        GroupedCard(modifier = Modifier.testTag("attention_item_$index")) {
             Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(stringResource(R.string.atencion_item_numero, index + 1), style = MaterialTheme.typography.titleSmall)
                 ItemField.entries.forEach { field ->
@@ -187,20 +192,25 @@ private fun AttentionForm(state: AttentionFormUiState, viewModel: AttentionFormV
                         singleLine = field != ItemField.INSTRUCTIONS,
                     )
                 }
-                TextButton(onClick = { viewModel.removeItem(index) }, modifier = Modifier.testTag("attention_item_${index}_remove")) {
-                    Text(stringResource(R.string.atencion_quitar_item))
-                }
+                LinkButton(
+                    text = stringResource(R.string.atencion_quitar_item),
+                    onClick = { viewModel.removeItem(index) },
+                    modifier = Modifier.testTag("attention_item_${index}_remove"),
+                )
             }
         }
     }
-    OutlinedButton(
+    SecondaryButton(
+        text = stringResource(R.string.atencion_agregar_item),
         onClick = viewModel::addItem,
         enabled = state.items.size < AttentionFormViewModel.MAX_ITEMS,
-        modifier = Modifier.fillMaxWidth().testTag("attention_add_item"),
-    ) { Text(stringResource(R.string.atencion_agregar_item)) }
-    Button(onClick = viewModel::review, modifier = Modifier.fillMaxWidth().testTag("attention_review")) {
-        Text(stringResource(R.string.atencion_revisar))
-    }
+        modifier = Modifier.testTag("attention_add_item"),
+    )
+    PrimaryButton(
+        text = stringResource(R.string.atencion_revisar),
+        onClick = viewModel::review,
+        modifier = Modifier.testTag("attention_review"),
+    )
 }
 
 @Composable
@@ -233,9 +243,11 @@ private fun AttentionConfirm(state: AttentionFormUiState, viewModel: AttentionFo
     }
     state.error?.let { ErrorNotice(it, "attention_error") }
     if (state.alreadyRecorded) {
-        Button(onClick = onExit, modifier = Modifier.fillMaxWidth().testTag("attention_view_existing")) {
-            Text(stringResource(R.string.atencion_ver_existente))
-        }
+        PrimaryButton(
+            text = stringResource(R.string.atencion_ver_existente),
+            onClick = onExit,
+            modifier = Modifier.testTag("attention_view_existing"),
+        )
     } else {
         // Deshabilitado mientras se envía: un doble toque no crea dos atenciones.
         SubmitButton(
@@ -246,9 +258,12 @@ private fun AttentionConfirm(state: AttentionFormUiState, viewModel: AttentionFo
         )
     }
     Row {
-        TextButton(onClick = viewModel::backToForm, enabled = !state.submitting, modifier = Modifier.testTag("attention_edit")) {
-            Text(stringResource(R.string.atencion_volver_a_editar))
-        }
+        LinkButton(
+            text = stringResource(R.string.atencion_volver_a_editar),
+            onClick = viewModel::backToForm,
+            enabled = !state.submitting,
+            modifier = Modifier.testTag("attention_edit"),
+        )
     }
     DebugSessionTools()
 }
@@ -289,19 +304,23 @@ fun ClinicalProfileFormScreen(viewModel: ClinicalProfileFormViewModel, onExit: (
                 FormStep.FORM -> {
                     Text(stringResource(R.string.perfil_clinico_explicacion), style = MaterialTheme.typography.bodyMedium)
                     state.error?.let { ErrorNotice(it, "profile_form_error") }
-                    ProfileField.entries.forEach { field ->
-                        ClinicalTextField(
-                            value = values.getValue(field),
-                            onValueChange = { viewModel.onChange(field, it) },
-                            label = stringResource(labels.getValue(field)),
-                            max = ClinicalProfileFormViewModel.MAX,
-                            error = state.fieldErrors[field],
-                            testTag = "profile_${field.name.lowercase()}",
-                        )
+                    FieldGroup {
+                        ProfileField.entries.forEach { field ->
+                            ClinicalTextField(
+                                value = values.getValue(field),
+                                onValueChange = { viewModel.onChange(field, it) },
+                                label = stringResource(labels.getValue(field)),
+                                max = ClinicalProfileFormViewModel.MAX,
+                                error = state.fieldErrors[field],
+                                testTag = "profile_${field.name.lowercase()}",
+                            )
+                        }
                     }
-                    Button(onClick = viewModel::review, modifier = Modifier.fillMaxWidth().testTag("profile_review")) {
-                        Text(stringResource(R.string.atencion_revisar))
-                    }
+                    PrimaryButton(
+                        text = stringResource(R.string.atencion_revisar),
+                        onClick = viewModel::review,
+                        modifier = Modifier.testTag("profile_review"),
+                    )
                 }
                 FormStep.CONFIRM -> {
                     val none = stringResource(R.string.expediente_sin_dato)
@@ -327,9 +346,11 @@ fun ClinicalProfileFormScreen(viewModel: ClinicalProfileFormViewModel, onExit: (
                         onClick = viewModel::submit,
                         testTag = "profile_confirm",
                     )
-                    TextButton(onClick = viewModel::backToForm, enabled = !state.submitting) {
-                        Text(stringResource(R.string.atencion_volver_a_editar))
-                    }
+                    LinkButton(
+                        text = stringResource(R.string.atencion_volver_a_editar),
+                        onClick = viewModel::backToForm,
+                        enabled = !state.submitting,
+                    )
                     DebugSessionTools()
                 }
                 FormStep.DONE -> {
@@ -341,9 +362,10 @@ fun ClinicalProfileFormScreen(viewModel: ClinicalProfileFormViewModel, onExit: (
                         modifier = Modifier.testTag("profile_done"),
                     )
                     state.saved?.let { ClinicalCard { ProfileFields(it) } }
-                    Button(onClick = onDone, modifier = Modifier.fillMaxWidth()) {
-                        Text(stringResource(R.string.perfil_clinico_volver))
-                    }
+                    PrimaryButton(
+                        text = stringResource(R.string.perfil_clinico_volver),
+                        onClick = onDone,
+                    )
                 }
             }
         }
@@ -377,17 +399,21 @@ fun AddendumFormScreen(viewModel: AddendumFormViewModel, onExit: () -> Unit, onD
                 FormStep.FORM -> {
                     Text(stringResource(R.string.adenda_explicacion), style = MaterialTheme.typography.bodyMedium)
                     state.error?.let { ErrorNotice(it, "addendum_form_error") }
-                    ClinicalTextField(
-                        state.text, { viewModel.onChange(AddendumField.TEXT, it) }, stringResource(R.string.adenda_texto),
-                        AddendumFormViewModel.TEXT_MAX, state.fieldErrors[AddendumField.TEXT], "addendum_text",
-                    )
-                    ClinicalTextField(
-                        state.reason, { viewModel.onChange(AddendumField.REASON, it) }, stringResource(R.string.adenda_motivo),
-                        AddendumFormViewModel.REASON_MAX, state.fieldErrors[AddendumField.REASON], "addendum_reason",
-                    )
-                    Button(onClick = viewModel::review, modifier = Modifier.fillMaxWidth().testTag("addendum_review")) {
-                        Text(stringResource(R.string.atencion_revisar))
+                    FieldGroup {
+                        ClinicalTextField(
+                            state.text, { viewModel.onChange(AddendumField.TEXT, it) }, stringResource(R.string.adenda_texto),
+                            AddendumFormViewModel.TEXT_MAX, state.fieldErrors[AddendumField.TEXT], "addendum_text",
+                        )
+                        ClinicalTextField(
+                            state.reason, { viewModel.onChange(AddendumField.REASON, it) }, stringResource(R.string.adenda_motivo),
+                            AddendumFormViewModel.REASON_MAX, state.fieldErrors[AddendumField.REASON], "addendum_reason",
+                        )
                     }
+                    PrimaryButton(
+                        text = stringResource(R.string.atencion_revisar),
+                        onClick = viewModel::review,
+                        modifier = Modifier.testTag("addendum_review"),
+                    )
                 }
                 FormStep.CONFIRM -> {
                     val request = state.toRequest()
@@ -412,9 +438,12 @@ fun AddendumFormScreen(viewModel: AddendumFormViewModel, onExit: () -> Unit, onD
                         onClick = viewModel::submit,
                         testTag = "addendum_confirm",
                     )
-                    TextButton(onClick = viewModel::backToForm, enabled = !state.submitting, modifier = Modifier.testTag("addendum_edit")) {
-                        Text(stringResource(R.string.atencion_volver_a_editar))
-                    }
+                    LinkButton(
+                        text = stringResource(R.string.atencion_volver_a_editar),
+                        onClick = viewModel::backToForm,
+                        enabled = !state.submitting,
+                        modifier = Modifier.testTag("addendum_edit"),
+                    )
                     DebugSessionTools()
                 }
                 FormStep.DONE -> {
@@ -431,9 +460,11 @@ fun AddendumFormScreen(viewModel: AddendumFormViewModel, onExit: () -> Unit, onD
                             InfoRow(stringResource(R.string.adenda_motivo), it.reason)
                         }
                     }
-                    Button(onClick = onDone, modifier = Modifier.fillMaxWidth().testTag("addendum_back")) {
-                        Text(stringResource(R.string.adenda_volver))
-                    }
+                    PrimaryButton(
+                        text = stringResource(R.string.adenda_volver),
+                        onClick = onDone,
+                        modifier = Modifier.testTag("addendum_back"),
+                    )
                 }
             }
         }
@@ -461,10 +492,12 @@ fun DoctorRecordScreen(viewModel: DoctorRecordViewModel, onBack: () -> Unit, onN
                 is LoadState.Loaded -> {
                     val record = load.data
                     record.patientName?.let { InfoRow(stringResource(R.string.medico_paciente), it) }
-                    OutlinedButton(onClick = onNewProfile, modifier = Modifier.fillMaxWidth().testTag("record_new_profile")) {
-                        Text(stringResource(R.string.perfil_clinico_nueva_version))
-                    }
-                    SectionTitle(stringResource(R.string.expediente_perfil_vigente))
+                    SecondaryButton(
+                        text = stringResource(R.string.perfil_clinico_nueva_version),
+                        onClick = onNewProfile,
+                        modifier = Modifier.testTag("record_new_profile"),
+                    )
+                    GroupedSectionHeader(stringResource(R.string.expediente_perfil_vigente))
                     val profile = record.profile
                     if (profile == null) {
                         EmptyState(message = stringResource(R.string.expediente_sin_perfil), scrollable = false)
@@ -473,10 +506,10 @@ fun DoctorRecordScreen(viewModel: DoctorRecordViewModel, onBack: () -> Unit, onN
                     }
                     val previous = record.profileHistory.drop(if (profile != null) 1 else 0)
                     if (previous.isNotEmpty()) {
-                        SectionTitle(stringResource(R.string.expediente_versiones_anteriores))
+                        GroupedSectionHeader(stringResource(R.string.expediente_versiones_anteriores))
                         previous.forEach { ClinicalCard { ProfileFields(it) } }
                     }
-                    SectionTitle(stringResource(R.string.expediente_tab_atenciones))
+                    GroupedSectionHeader(stringResource(R.string.expediente_tab_atenciones))
                     if (record.attentions.isEmpty()) {
                         Text(stringResource(R.string.expediente_sin_atenciones))
                     } else {
@@ -485,5 +518,13 @@ fun DoctorRecordScreen(viewModel: DoctorRecordViewModel, onBack: () -> Unit, onN
                 }
             }
         }
+    }
+}
+
+/** Campos de un formulario agrupados en una tarjeta (como las listas agrupadas). */
+@Composable
+private fun FieldGroup(content: @Composable ColumnScope.() -> Unit) {
+    GroupedCard {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp), content = content)
     }
 }

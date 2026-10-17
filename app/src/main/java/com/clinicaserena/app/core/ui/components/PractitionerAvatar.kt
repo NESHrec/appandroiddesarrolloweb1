@@ -25,13 +25,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.clinicaserena.app.R
 import com.clinicaserena.app.core.image.practitionerInitials
 import com.clinicaserena.app.core.ui.LocalAppContainer
-import com.clinicaserena.app.core.ui.theme.SerenaTexto
-import com.clinicaserena.app.core.ui.theme.SerenaTurquesa
+import com.clinicaserena.app.core.ui.theme.LocalSerenaColors
 
 /**
  * Foto pública del profesional, o sus iniciales mientras carga, si no tiene foto o sin conexión. Con foto,
@@ -45,11 +43,12 @@ fun PractitionerAvatar(name: String, photoUrl: String?, size: Dp, modifier: Modi
         if (image == null && photoUrl != null) image = loader.load(photoUrl)
     }
     val loaded = image
+    val tone = LocalSerenaColors.current.avatarBlue
     Box(
         modifier = modifier
             .size(size)
             .clip(CircleShape)
-            .background(SerenaTurquesa)
+            .background(tone.background)
             .testTag(if (loaded != null) "practitioner_avatar_photo" else "practitioner_avatar_initials"),
         contentAlignment = Alignment.Center,
     ) {
@@ -67,7 +66,7 @@ fun PractitionerAvatar(name: String, photoUrl: String?, size: Dp, modifier: Modi
                 val fontSize = (size.value * 0.38f / LocalDensity.current.fontScale).sp
                 Text(
                     initials,
-                    color = SerenaTexto,
+                    color = tone.content,
                     fontSize = fontSize,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.clearAndSetSemantics {},
@@ -76,7 +75,7 @@ fun PractitionerAvatar(name: String, photoUrl: String?, size: Dp, modifier: Modi
                 Icon(
                     painterResource(R.drawable.ic_person),
                     contentDescription = null,
-                    tint = SerenaTexto,
+                    tint = tone.content,
                     modifier = Modifier.size(size * 0.5f),
                 )
             }

@@ -185,7 +185,6 @@
     <string name="receta_emitida">Receta del %1$s</string>
     <string name="receta_cita">Cita</string>
     <string name="receta_sin_medicamentos">Sin medicamentos indicados.</string>
-    <string name="receta_item_detalle">%1$s · %2$s · %3$s</string>
     <string name="receta_instrucciones">Indicaciones: %1$s</string>
 
     <!-- Mi expediente -->
@@ -244,7 +243,6 @@
     <string name="medico_sin_proximas">No hay más citas en este período.</string>
     <string name="medico_agenda_vacia">No tienes citas en este rango con el filtro elegido.</string>
     <string name="medico_lista_para_documentar">Lista para documentar</string>
-    <string name="medico_llegada">Llegada</string>
     <string name="medico_llegada_registrada">Llegó a las %1$s</string>
     <string name="medico_llegada_sin_registrar">Llegada sin registrar</string>
     <string name="medico_paciente">Paciente</string>

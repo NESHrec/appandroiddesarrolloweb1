@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +23,7 @@ import com.clinicaserena.app.R
 import com.clinicaserena.app.core.ui.asString
 import com.clinicaserena.app.core.ui.components.FormTextField
 import com.clinicaserena.app.core.ui.components.PasswordField
+import com.clinicaserena.app.core.ui.components.SecondaryButton
 import com.clinicaserena.app.core.ui.components.StatusBanner
 import com.clinicaserena.app.core.ui.theme.LocalStatusColors
 import com.clinicaserena.app.feature.common.BackScaffold
@@ -38,7 +38,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, onBack: () -> Unit) {
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             if (state.sent) {
@@ -49,13 +49,19 @@ fun RegisterScreen(viewModel: RegisterViewModel, onBack: () -> Unit) {
                     background = LocalStatusColors.current.success,
                     modifier = Modifier.testTag("register_sent"),
                 )
-                OutlinedButton(onClick = onBack, modifier = Modifier.testTag("register_back_to_login")) {
-                    Text(stringResource(R.string.volver_a_inicio_sesion))
-                }
+                SecondaryButton(
+                    text = stringResource(R.string.volver_a_inicio_sesion),
+                    onClick = onBack,
+                    modifier = Modifier.testTag("register_back_to_login"),
+                )
                 return@Column
             }
 
-            Text(stringResource(R.string.registro_explicacion), style = MaterialTheme.typography.bodyLarge)
+            Text(
+                stringResource(R.string.registro_explicacion),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             FormTextField(
                 value = state.name,
                 onValueChange = viewModel::onNameChange,
