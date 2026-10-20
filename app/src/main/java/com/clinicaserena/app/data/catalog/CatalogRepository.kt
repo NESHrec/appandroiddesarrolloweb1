@@ -27,6 +27,10 @@ data class PractitionerResponse(
     val specialtyId: String,
     val specialtyName: String,
     val licenseNumber: String? = null,
+    /** Desde V15: `/medicos` ya solo devuelve activos; se tolera su ausencia en un backend anterior. */
+    val active: Boolean = true,
+    /** Ruta relativa de la foto pública (`/api/v1/medicos/{id}/foto?v=…`) o `null` si no tiene. */
+    val photoUrl: String? = null,
 )
 
 /** `AvailabilitySlotDto` de Spring. Las fechas se guardan como texto para reenviar `startAt` tal cual. */
@@ -113,7 +117,7 @@ class RemoteCatalogRepository(
             is ApiResult.Failure -> result
         }
 
-    private fun PractitionerResponse.toDomain() = Practitioner(id, fullName, specialtyId, specialtyName)
+    private fun PractitionerResponse.toDomain() = Practitioner(id, fullName, specialtyId, specialtyName, photoUrl)
 
     private fun AvailabilitySlotResponse.toDomain() = Slot(
         id = id,

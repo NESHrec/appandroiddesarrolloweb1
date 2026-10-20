@@ -15,7 +15,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -34,6 +33,7 @@ import com.clinicaserena.app.core.time.ClinicTime
 import com.clinicaserena.app.core.ui.LoadState
 import com.clinicaserena.app.core.ui.components.EmptyState
 import com.clinicaserena.app.core.ui.components.LoadingState
+import com.clinicaserena.app.core.ui.components.SelectableFilterChip
 import com.clinicaserena.app.core.ui.components.StatusBanner
 import com.clinicaserena.app.core.ui.theme.LocalStatusColors
 import com.clinicaserena.app.domain.model.AppointmentStatus
@@ -71,10 +71,10 @@ fun DoctorHomeScreen(viewModel: DoctorHomeViewModel, onOpenAppointment: (String)
                     HomePeriod.WEEK to R.string.medico_filtro_semana,
                     HomePeriod.MONTH to R.string.medico_filtro_mes,
                 ).forEach { (period, label) ->
-                    FilterChip(
+                    SelectableFilterChip(
                         selected = state.period == period,
+                        label = stringResource(label),
                         onClick = { viewModel.selectPeriod(period) },
-                        label = { Text(stringResource(label)) },
                         modifier = Modifier.testTag("period_${period.name}"),
                     )
                 }
@@ -158,10 +158,10 @@ fun DoctorAgendaScreen(viewModel: DoctorAgendaViewModel, onOpenAppointment: (Str
                     AgendaRange.LAST_7 to R.string.medico_filtro_ultimos_7,
                     AgendaRange.NEXT_30 to R.string.medico_filtro_proximos_30,
                 ).forEach { (range, label) ->
-                    FilterChip(
+                    SelectableFilterChip(
                         selected = state.range == range,
+                        label = stringResource(label),
                         onClick = { viewModel.selectRange(range) },
-                        label = { Text(stringResource(label)) },
                         modifier = Modifier.testTag("range_${range.name}"),
                     )
                 }
@@ -176,10 +176,10 @@ fun DoctorAgendaScreen(viewModel: DoctorAgendaViewModel, onOpenAppointment: (Str
                     AppointmentStatus.COMPLETADA to R.string.cita_estado_completada,
                     AppointmentStatus.CANCELADA to R.string.cita_estado_cancelada,
                 ).forEach { (status, label) ->
-                    FilterChip(
+                    SelectableFilterChip(
                         selected = state.status == status,
+                        label = stringResource(label),
                         onClick = { viewModel.selectStatus(status) },
-                        label = { Text(stringResource(label)) },
                         modifier = Modifier.testTag("agenda_status_${status?.name ?: "TODOS"}"),
                     )
                 }
