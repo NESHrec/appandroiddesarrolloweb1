@@ -4,18 +4,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.PrimaryScrollableTabRow
-import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,14 +25,13 @@ import com.clinicaserena.app.core.ui.FailureContent
 import com.clinicaserena.app.core.ui.LoadState
 import com.clinicaserena.app.core.ui.components.EmptyState
 import com.clinicaserena.app.core.ui.components.LoadingState
+import com.clinicaserena.app.core.ui.components.SecondaryButton
+import com.clinicaserena.app.core.ui.components.SegmentedControl
 import com.clinicaserena.app.core.ui.components.StatusBanner
 import com.clinicaserena.app.core.ui.theme.LocalStatusColors
-import com.clinicaserena.app.domain.model.Attention
 import com.clinicaserena.app.domain.model.Checkup
-import com.clinicaserena.app.domain.model.ClinicalProfile
 import com.clinicaserena.app.domain.model.ClinicalRecord
 import com.clinicaserena.app.domain.model.Prescription
-import com.clinicaserena.app.domain.model.PrescriptionItem
 import com.clinicaserena.app.feature.clinical.AttentionCard
 import com.clinicaserena.app.feature.clinical.ClinicalCard
 import com.clinicaserena.app.feature.clinical.PrescriptionItems
@@ -64,12 +56,12 @@ fun PrescriptionsScreen(viewModel: PrescriptionsViewModel) {
             )
         } else {
             LazyColumn(
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxSize().testTag("prescriptions_list"),
             ) {
                 item(key = "actualizar") {
-                    OutlinedButton(onClick = viewModel::load) { Text(stringResource(R.string.perfil_actualizar)) }
+                    SecondaryButton(text = stringResource(R.string.perfil_actualizar), onClick = viewModel::load, fillWidth = false)
                 }
                 items(load.data, key = { it.id }) { PrescriptionCard(it) }
             }
@@ -100,27 +92,22 @@ fun MyRecordScreen(viewModel: MyRecordViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     Column(Modifier.fillMaxSize()) {
-        // Pestañas desplazables: con fuente grande cada etiqueta se lee completa en vez de recortarse.
-        PrimaryScrollableTabRow(
-            selectedTabIndex = state.tab.ordinal,
-            containerColor = MaterialTheme.colorScheme.background,
-            edgePadding = 0.dp,
-        ) {
-            listOf(
-                RecordTab.SUMMARY to R.string.expediente_tab_resumen,
-                RecordTab.ATTENTIONS to R.string.expediente_tab_atenciones,
-                RecordTab.CHECKUPS to R.string.expediente_tab_seguimientos,
-            ).forEach { (tab, label) ->
-                Tab(
-                    selected = state.tab == tab,
-                    onClick = { viewModel.selectTab(tab) },
-                    text = { Text(stringResource(label), maxLines = 1) },
-                    modifier = Modifier.testTag("record_tab_${tab.name}"),
-                )
-            }
-        }
+        // Resumen/Atenciones/Seguimientos: control segmentado con semántica de pestañas. Con fuente
+        // grande cada etiqueta puede ocupar dos líneas en vez de recortarse.
+        val tabs = listOf(
+            RecordTab.SUMMARY to R.string.expediente_tab_resumen,
+            RecordTab.ATTENTIONS to R.string.expediente_tab_atenciones,
+            RecordTab.CHECKUPS to R.string.expediente_tab_seguimientos,
+        )
+        SegmentedControl(
+            options = tabs.map { stringResource(it.second) },
+            selectedIndex = tabs.indexOfFirst { it.first == state.tab },
+            onSelect = { viewModel.selectTab(tabs[it].first) },
+            testTags = tabs.map { "record_tab_${it.first.name}" },
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
+        )
         LazyColumn(
-            contentPadding = PaddingValues(16.dp),
+            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxSize().testTag("record_content"),
         ) {

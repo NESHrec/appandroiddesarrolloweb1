@@ -1,17 +1,22 @@
 package com.clinicaserena.app.core.ui.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
@@ -20,8 +25,9 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.unit.dp
 import com.clinicaserena.app.R
+import com.clinicaserena.app.core.ui.theme.LocalSerenaColors
 
 /**
  * Campo de texto con etiqueta visible y error anunciado por accesibilidad. [contentType] lo marca
@@ -49,6 +55,8 @@ fun FormTextField(
         isError = error != null,
         supportingText = error?.let { { Text(it) } },
         singleLine = true,
+        shape = FieldShape,
+        colors = serenaFieldColors(),
         enabled = enabled,
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
@@ -94,6 +102,8 @@ fun PasswordField(
         isError = error != null,
         supportingText = error?.let { { Text(it) } },
         singleLine = true,
+        shape = FieldShape,
+        colors = serenaFieldColors(),
         enabled = enabled,
         visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
@@ -119,5 +129,29 @@ fun PasswordField(
                 this.contentType = contentType
                 if (error != null) error(error)
             },
+    )
+}
+
+/** Campos de tarjeta con esquinas de 14 dp; el borde se vuelve azul con el foco y del color de error si falla. */
+val FieldShape = RoundedCornerShape(14.dp)
+
+@Composable
+fun serenaFieldColors(): TextFieldColors {
+    val scheme = MaterialTheme.colorScheme
+    val colors = LocalSerenaColors.current
+    return OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = colors.card,
+        unfocusedContainerColor = colors.card,
+        disabledContainerColor = colors.card,
+        errorContainerColor = colors.card,
+        focusedBorderColor = colors.link,
+        unfocusedBorderColor = colors.fieldBorder,
+        focusedLabelColor = colors.link,
+        unfocusedLabelColor = colors.textSecondary,
+        focusedTextColor = colors.text,
+        unfocusedTextColor = colors.text,
+        cursorColor = colors.link,
+        errorBorderColor = scheme.error,
+        errorLabelColor = scheme.error,
     )
 }

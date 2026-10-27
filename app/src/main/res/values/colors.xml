@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Fondo del ícono de la app (sin cambios en el rediseño). -->
     <color name="serena_principal">#FF62727B</color>
-    <color name="serena_fondo">#FFF6FAFA</color>
+    <!-- Fondo de la ventana mientras arranca Compose: igual al fondo de la app en día. -->
+    <color name="serena_fondo">#FFF4F6FB</color>
 </resources>

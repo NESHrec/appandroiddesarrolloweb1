@@ -2,13 +2,15 @@ package com.clinicaserena.app.feature.doctor.care
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import com.clinicaserena.app.R
+import com.clinicaserena.app.core.ui.components.LinkButton
+import com.clinicaserena.app.core.ui.theme.LocalSerenaColors
 
 /** Resultado de pulsar Atrás en un formulario inmutable. */
 enum class FormBack {
@@ -58,15 +60,23 @@ fun DiscardDraftDialog(visible: Boolean, onKeepEditing: () -> Unit, onDiscard: (
         title = { Text(stringResource(R.string.borrador_descartar_titulo)) },
         text = { Text(stringResource(R.string.borrador_descartar_mensaje)) },
         confirmButton = {
-            TextButton(onClick = onDiscard, modifier = Modifier.testTag("discard_confirm")) {
-                Text(stringResource(R.string.borrador_descartar))
-            }
+            LinkButton(
+                text = stringResource(R.string.borrador_descartar),
+                onClick = onDiscard,
+                modifier = Modifier.testTag("discard_confirm"),
+            )
         },
         dismissButton = {
-            TextButton(onClick = onKeepEditing, modifier = Modifier.testTag("discard_keep")) {
-                Text(stringResource(R.string.borrador_seguir_editando))
-            }
+            LinkButton(
+                text = stringResource(R.string.borrador_seguir_editando),
+                onClick = onKeepEditing,
+                modifier = Modifier.testTag("discard_keep"),
+            )
         },
+        containerColor = LocalSerenaColors.current.card,
+        titleContentColor = LocalSerenaColors.current.text,
+        textContentColor = LocalSerenaColors.current.textSecondary,
+        shape = MaterialTheme.shapes.large,
         modifier = Modifier.testTag("discard_dialog"),
     )
 }

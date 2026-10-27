@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,6 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.clinicaserena.app.R
 import com.clinicaserena.app.core.ui.asString
 import com.clinicaserena.app.core.ui.components.FormTextField
+import com.clinicaserena.app.core.ui.components.SecondaryButton
 import com.clinicaserena.app.core.ui.components.StatusBanner
 import com.clinicaserena.app.core.ui.theme.LocalStatusColors
 import com.clinicaserena.app.feature.common.BackScaffold
@@ -40,7 +40,7 @@ fun EmailRequestScreen(mode: EmailRequestMode, viewModel: EmailRequestViewModel,
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             if (state.sent) {
@@ -53,13 +53,14 @@ fun EmailRequestScreen(mode: EmailRequestMode, viewModel: EmailRequestViewModel,
                     background = LocalStatusColors.current.success,
                     modifier = Modifier.testTag("email_request_sent"),
                 )
-                OutlinedButton(onClick = onBack) { Text(stringResource(R.string.volver_a_inicio_sesion)) }
+                SecondaryButton(text = stringResource(R.string.volver_a_inicio_sesion), onClick = onBack)
                 return@Column
             }
 
             Text(
                 stringResource(if (recovery) R.string.recuperar_explicacion else R.string.reenviar_explicacion),
                 style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             FormTextField(
                 value = state.email,

@@ -1,27 +1,21 @@
 package com.clinicaserena.app.feature.patient.appointments
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.PrimaryTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,7 +30,15 @@ import com.clinicaserena.app.core.time.ClinicTime
 import com.clinicaserena.app.core.ui.FailureContent
 import com.clinicaserena.app.core.ui.LoadState
 import com.clinicaserena.app.core.ui.components.EmptyState
+import com.clinicaserena.app.core.ui.components.GroupedCard
+import com.clinicaserena.app.core.ui.components.GroupedSectionHeader
+import com.clinicaserena.app.core.ui.components.HairlineDivider
 import com.clinicaserena.app.core.ui.components.LoadingState
+import com.clinicaserena.app.core.ui.components.PractitionerAvatar
+import com.clinicaserena.app.core.ui.components.PrimaryButton
+import com.clinicaserena.app.core.ui.components.SecondaryButton
+import com.clinicaserena.app.core.ui.components.SegmentedControl
+import com.clinicaserena.app.core.ui.components.SelectableFilterChip
 import com.clinicaserena.app.core.ui.components.StatusBanner
 import com.clinicaserena.app.core.ui.theme.LocalStatusColors
 import com.clinicaserena.app.domain.model.AppointmentStatus
@@ -60,33 +62,32 @@ fun PatientHomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Text(stringResource(R.string.inicio_proxima_cita), style = MaterialTheme.typography.titleMedium)
+        val next = (state.load as? LoadState.Loaded)?.data?.let { AppointmentsLogic.next(it, viewModel.now()) }
+        // Con próxima cita, el título va dentro de la tarjeta con degradado; si no, como encabezado de sección.
+        if (next == null) GroupedSectionHeader(stringResource(R.string.inicio_proxima_cita))
         when (val load = state.load) {
             LoadState.Loading -> LoadingState(modifier = Modifier.padding(vertical = 24.dp))
             is LoadState.Failed -> FailureContent(load.failure, onRetry = viewModel::load, scrollable = false)
-            is LoadState.Loaded -> {
-                val next = AppointmentsLogic.next(load.data, viewModel.now())
-                if (next == null) {
-                    EmptyState(
-                        title = stringResource(R.string.inicio_sin_proxima_titulo),
-                        message = stringResource(R.string.inicio_sin_proxima_mensaje),
-                        scrollable = false,
-                        modifier = Modifier.testTag("home_no_next"),
-                    )
-                } else {
-                    AppointmentCard(next, onClick = { onOpenAppointment(next.appointment.id) }, modifier = Modifier.testTag("home_next"))
-                }
+            is LoadState.Loaded -> if (next == null) {
+                EmptyState(
+                    title = stringResource(R.string.inicio_sin_proxima_titulo),
+                    message = stringResource(R.string.inicio_sin_proxima_mensaje),
+                    scrollable = false,
+                    modifier = Modifier.testTag("home_no_next"),
+                )
+            } else {
+                NextAppointmentCard(next, onClick = { onOpenAppointment(next.appointment.id) }, modifier = Modifier.testTag("home_next"))
             }
         }
-        Button(onClick = onBook, modifier = Modifier.fillMaxWidth().testTag("home_book")) {
-            Text(stringResource(R.string.reservar_cita))
-        }
-        OutlinedButton(onClick = onSeeAll, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.ver_mis_citas))
-        }
+        PrimaryButton(
+            text = stringResource(R.string.reservar_cita),
+            onClick = onBook,
+            modifier = Modifier.padding(top = 4.dp).testTag("home_book"),
+        )
+        SecondaryButton(text = stringResource(R.string.ver_mis_citas), onClick = onSeeAll)
     }
 }
 
@@ -102,25 +103,19 @@ fun AppointmentListScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     Column(Modifier.fillMaxSize()) {
-        PrimaryTabRow(selectedTabIndex = state.tab.ordinal, containerColor = MaterialTheme.colorScheme.background) {
-            Tab(
-                selected = state.tab == AppointmentTab.UPCOMING,
-                onClick = { viewModel.selectTab(AppointmentTab.UPCOMING) },
-                text = { Text(stringResource(R.string.citas_proximas)) },
-                modifier = Modifier.testTag("tab_upcoming"),
-            )
-            Tab(
-                selected = state.tab == AppointmentTab.HISTORY,
-                onClick = { viewModel.selectTab(AppointmentTab.HISTORY) },
-                text = { Text(stringResource(R.string.citas_historial)) },
-                modifier = Modifier.testTag("tab_history"),
-            )
-        }
+        // Próximas/Historial: control segmentado con semántica de pestañas (fijo arriba).
+        SegmentedControl(
+            options = listOf(stringResource(R.string.citas_proximas), stringResource(R.string.citas_historial)),
+            selectedIndex = state.tab.ordinal,
+            onSelect = { viewModel.selectTab(AppointmentTab.entries[it]) },
+            testTags = listOf("tab_upcoming", "tab_history"),
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
+        )
         // Filtros, botones y citas se desplazan juntos (solo las pestañas quedan fijas): con fuente grande
         // o pantalla pequeña la lista sigue teniendo espacio. FlowRow evita el scroll horizontal.
         LazyColumn(
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.fillMaxSize().testTag("appointments_list"),
         ) {
             item(key = "filtros") {
@@ -136,10 +131,10 @@ fun AppointmentListScreen(
                         AppointmentStatus.CANCELADA to R.string.cita_estado_cancelada,
                     )
                     filters.forEach { (status, label) ->
-                        FilterChip(
+                        SelectableFilterChip(
                             selected = state.statusFilter == status,
+                            label = stringResource(label),
                             onClick = { viewModel.selectStatus(status) },
-                            label = { Text(stringResource(label)) },
                             modifier = Modifier.testTag("filter_${status?.name ?: "TODOS"}"),
                         )
                     }
@@ -151,12 +146,18 @@ fun AppointmentListScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Button(onClick = onBook, modifier = Modifier.weight(1f).testTag("list_book")) {
-                        Text(stringResource(R.string.reservar_cita))
-                    }
-                    OutlinedButton(onClick = viewModel::load, modifier = Modifier.testTag("list_refresh")) {
-                        Text(stringResource(R.string.perfil_actualizar))
-                    }
+                    PrimaryButton(
+                        text = stringResource(R.string.reservar_cita),
+                        onClick = onBook,
+                        fillWidth = false,
+                        modifier = Modifier.weight(1f).testTag("list_book"),
+                    )
+                    SecondaryButton(
+                        text = stringResource(R.string.perfil_actualizar),
+                        onClick = viewModel::load,
+                        fillWidth = false,
+                        modifier = Modifier.testTag("list_refresh"),
+                    )
                 }
             }
             when (val load = state.load) {
@@ -184,8 +185,22 @@ fun AppointmentListScreen(
                             )
                         }
                     } else {
-                        items(items, key = { it.appointment.id }) { item ->
-                            AppointmentCard(item, onClick = { onOpenAppointment(item.appointment.id) })
+                        // Agrupadas por día (Guatemala), en el mismo orden que ya trae la pestaña.
+                        items.groupBy(::appointmentDayKey).forEach { (day, group) ->
+                            item(key = "dia-$day") {
+                                GroupedSectionHeader(
+                                    ClinicTime.formatDay(group.first().appointment.scheduledAt),
+                                    modifier = Modifier.padding(top = 6.dp),
+                                )
+                            }
+                            item(key = "grupo-$day") {
+                                GroupedCard {
+                                    group.forEachIndexed { index, item ->
+                                        if (index > 0) HairlineDivider(startIndent = 72.dp)
+                                        AppointmentRow(item, onClick = { onOpenAppointment(item.appointment.id) })
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -215,7 +230,7 @@ fun AppointmentDetailScreen(viewModel: PatientAppointmentsViewModel, appointment
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+                .padding(horizontal = 20.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             when {
@@ -236,20 +251,17 @@ fun AppointmentDetailScreen(viewModel: PatientAppointmentsViewModel, appointment
 @Composable
 private fun AppointmentDetailContent(item: AppointmentItem) {
     val appointment = item.appointment
-    Card(
-        modifier = Modifier.fillMaxWidth().testTag("appointment_detail"),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    GroupedCard(modifier = Modifier.testTag("appointment_detail")) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            PractitionerRow(item.practitionerName, item.practitionerPhotoUrl)
             StatusChip(appointment.status, appointment.statusRaw)
+        }
+        HairlineDivider(startIndent = 16.dp)
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             InfoRow(stringResource(R.string.cita_fecha_hora), ClinicTime.formatDateTime(appointment.scheduledAt))
             InfoRow(
                 stringResource(R.string.cita_especialidad),
                 item.specialtyName ?: stringResource(R.string.cita_especialidad_desconocida),
-            )
-            InfoRow(
-                stringResource(R.string.cita_medico),
-                item.practitionerName ?: stringResource(R.string.cita_medico_desconocido),
             )
             InfoRow(
                 stringResource(R.string.cita_notas),
@@ -266,4 +278,17 @@ private fun AppointmentDetailContent(item: AppointmentItem) {
         message = stringResource(R.string.cita_cambios_mensaje),
         background = LocalStatusColors.current.info,
     )
+}
+
+/** Fila «Médico» con su foto pública (o iniciales). Sin nombre conocido, solo el texto de respaldo. */
+@Composable
+private fun PractitionerRow(name: String?, photoUrl: String?) {
+    val shown = name ?: stringResource(R.string.cita_medico_desconocido)
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        if (name != null) {
+            PractitionerAvatar(name = name, photoUrl = photoUrl, size = 64.dp)
+            Spacer(Modifier.width(12.dp))
+        }
+        Box(Modifier.weight(1f)) { InfoRow(stringResource(R.string.cita_medico), shown) }
+    }
 }

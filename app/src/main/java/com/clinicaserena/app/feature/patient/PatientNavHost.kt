@@ -1,12 +1,15 @@
 package com.clinicaserena.app.feature.patient
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -14,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.clinicaserena.app.R
 import com.clinicaserena.app.core.ui.LocalAppContainer
+import com.clinicaserena.app.core.ui.theme.LocalSerenaColors
 import com.clinicaserena.app.feature.common.RoleNavScaffold
 import com.clinicaserena.app.feature.common.TopLevelDestination
 import com.clinicaserena.app.feature.patient.appointments.AppointmentDetailScreen
@@ -40,10 +44,10 @@ import kotlinx.serialization.Serializable
 @Serializable data object BookingRoute
 
 private val patientDestinations = listOf(
-    TopLevelDestination(PatientHomeRoute, R.string.nav_inicio, R.drawable.ic_home),
-    TopLevelDestination(PatientAppointmentsRoute, R.string.nav_citas, R.drawable.ic_calendar),
-    TopLevelDestination(PatientRecordRoute, R.string.nav_expediente, R.drawable.ic_folder),
-    TopLevelDestination(PatientPrescriptionsRoute, R.string.nav_recetas, R.drawable.ic_receipt),
+    TopLevelDestination(PatientHomeRoute, R.string.nav_inicio, R.drawable.ic_home, R.drawable.ic_home_outline),
+    TopLevelDestination(PatientAppointmentsRoute, R.string.nav_citas, R.drawable.ic_calendar, R.drawable.ic_calendar_outline),
+    TopLevelDestination(PatientRecordRoute, R.string.nav_expediente, R.drawable.ic_folder, R.drawable.ic_folder_outline),
+    TopLevelDestination(PatientPrescriptionsRoute, R.string.nav_recetas, R.drawable.ic_receipt, R.drawable.ic_receipt_outline),
 )
 
 /** Navegación del PACIENTE: Inicio, Citas (lista, detalle y reserva), Mi expediente, Recetas y Mi perfil. */
@@ -66,9 +70,12 @@ fun PatientNavHost() {
         startDestination = PatientHomeRoute,
         navController = navController,
         topBarActions = {
+            // Botón circular con el tono de avatar (el ícono de persona de siempre, con su descripción).
+            val avatar = LocalSerenaColors.current.avatarBlue
             IconButton(
                 onClick = { navController.navigate(PatientProfileRoute) { launchSingleTop = true } },
-                modifier = Modifier.testTag("patient_profile_action"),
+                colors = IconButtonDefaults.iconButtonColors(containerColor = avatar.background, contentColor = avatar.content),
+                modifier = Modifier.size(48.dp).testTag("patient_profile_action"),
             ) {
                 Icon(painterResource(R.drawable.ic_person), contentDescription = stringResource(R.string.perfil_titulo))
             }

@@ -3,15 +3,9 @@ package com.clinicaserena.app.feature.doctor.profile
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -27,7 +21,9 @@ import com.clinicaserena.app.core.network.ApiResult
 import com.clinicaserena.app.core.security.SessionManager
 import com.clinicaserena.app.core.ui.FailureContent
 import com.clinicaserena.app.core.ui.LoadState
+import com.clinicaserena.app.core.ui.components.GroupedCard
 import com.clinicaserena.app.core.ui.components.LoadingState
+import com.clinicaserena.app.core.ui.components.SecondaryButton
 import com.clinicaserena.app.core.ui.components.StatusBanner
 import com.clinicaserena.app.core.ui.theme.LocalStatusColors
 import com.clinicaserena.app.core.ui.toLoadState
@@ -99,17 +95,18 @@ fun DoctorProfileScreen(viewModel: DoctorProfileViewModel) {
                     )
                     else -> Unit
                 }
-                Card(
-                    modifier = Modifier.fillMaxWidth().testTag("doctor_profile_card"),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                ) {
+                GroupedCard(modifier = Modifier.testTag("doctor_profile_card")) {
                     Column(Modifier.padding(16.dp)) {
                         identity.fullName?.let { InfoRow(stringResource(R.string.perfil_nombre), it) }
                         InfoRow(stringResource(R.string.perfil_correo), identity.email)
                         InfoRow(stringResource(R.string.perfil_rol), stringResource(R.string.rol_medico))
                     }
                 }
-                OutlinedButton(onClick = viewModel::load) { Text(stringResource(R.string.perfil_actualizar)) }
+                SecondaryButton(
+                    text = stringResource(R.string.perfil_actualizar),
+                    onClick = viewModel::load,
+                    fillWidth = false,
+                )
             }
         }
         LogoutSection()

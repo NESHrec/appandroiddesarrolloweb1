@@ -60,13 +60,14 @@ class PatientAppointmentsViewModel(
                 is ApiResult.Failure -> LoadState.Failed(result)
                 is ApiResult.Success -> {
                     // Si el catálogo falla, las citas se muestran igual, sin nombres.
-                    val practitionerNames = (practitioners.await() as? ApiResult.Success)?.data
-                        ?.associate { it.id to it.fullName }.orEmpty()
+                    val practitionersById = (practitioners.await() as? ApiResult.Success)?.data
+                        ?.associateBy { it.id }.orEmpty()
                     val specialtyNames = (specialties.await() as? ApiResult.Success)?.data
                         ?.associate { it.id to it.name }.orEmpty()
                     LoadState.Loaded(
                         result.data.map {
-                            AppointmentItem(it, practitionerNames[it.practitionerId], specialtyNames[it.specialtyId])
+                            val practitioner = practitionersById[it.practitionerId]
+                            AppointmentItem(it, practitioner?.fullName, specialtyNames[it.specialtyId], practitioner?.photoUrl)
                         },
                     )
                 }

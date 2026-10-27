@@ -84,6 +84,33 @@ class PatientAppointmentsViewModelTest {
     }
 
     @Test
+    fun `la cita trae la foto del medico, y un medico fuera del catalogo queda sin foto`() = runTest {
+        val repo = FakeAppointmentsRepository().apply {
+            listResult = ApiResult.Success(
+                listOf(
+                    appt("a", "2026-10-09T15:00:00Z", AppointmentStatus.PENDIENTE),
+                    appt("b", "2026-10-10T15:00:00Z", AppointmentStatus.PENDIENTE).copy(practitionerId = "med-inactivo"),
+                ),
+            )
+        }
+        val catalog = FakeCatalogRepository().apply {
+            practitionersResult = ApiResult.Success(
+                listOf(
+                    com.clinicaserena.app.domain.model.Practitioner(
+                        "med-1", "Dra. Elena Morales", "esp-1", "Odontología general", "/api/v1/medicos/med-1/foto?v=k.png",
+                    ),
+                ),
+            )
+        }
+        val vm = PatientAppointmentsViewModel(repo, catalog, SessionFixture(backgroundScope).manager, TEST_CLOCK)
+
+        val items = (vm.state.value.load as LoadState.Loaded).data.associateBy { it.appointment.id }
+        assertEquals("/api/v1/medicos/med-1/foto?v=k.png", items.getValue("a").practitionerPhotoUrl)
+        assertNull("médico inactivo: sin nombre ni foto, se ven las iniciales o el texto de respaldo", items.getValue("b").practitionerPhotoUrl)
+        assertNull(items.getValue("b").practitionerName)
+    }
+
+    @Test
     fun `si el catalogo falla las citas se muestran sin nombres`() = runTest {
         val repo = FakeAppointmentsRepository().apply {
             listResult = ApiResult.Success(listOf(appt("a", "2026-10-09T15:00:00Z", AppointmentStatus.PENDIENTE)))

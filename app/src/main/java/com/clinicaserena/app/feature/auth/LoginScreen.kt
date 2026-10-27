@@ -10,16 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,13 +30,18 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.clinicaserena.app.R
 import com.clinicaserena.app.core.security.LogoutReason
 import com.clinicaserena.app.core.ui.asString
 import com.clinicaserena.app.core.ui.components.FormTextField
+import com.clinicaserena.app.core.ui.components.GroupedCard
+import com.clinicaserena.app.core.ui.components.LinkButton
 import com.clinicaserena.app.core.ui.components.PasswordField
+import com.clinicaserena.app.core.ui.components.PrimaryButton
+import com.clinicaserena.app.core.ui.components.SecondaryButton
 import com.clinicaserena.app.core.ui.components.StatusBanner
 import com.clinicaserena.app.core.ui.theme.LocalStatusColors
 import com.clinicaserena.app.core.ui.toUserMessage
@@ -61,76 +62,87 @@ fun LoginScreen(
             .fillMaxSize()
             .safeDrawingPadding()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp, vertical = 32.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .padding(horizontal = 20.dp, vertical = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = stringResource(R.string.login_titulo),
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.semantics { heading() },
-        )
-        Text(text = stringResource(R.string.login_subtitulo), style = MaterialTheme.typography.bodyLarge)
-
-        if (!state.reasonDismissed) LogoutReasonBanner(reason)
-        if (state.unsupportedRole) UnsupportedRoleBanner()
-
-        FormTextField(
-            value = state.email,
-            onValueChange = viewModel::onEmailChange,
-            label = stringResource(R.string.campo_correo),
-            error = state.emailError?.let { stringResource(it) },
-            testTag = "login_email",
-            keyboardType = KeyboardType.Email,
-            contentType = ContentType.Username + ContentType.EmailAddress,
-            enabled = !state.submitting,
-        )
-        PasswordField(
-            value = state.password,
-            onValueChange = viewModel::onPasswordChange,
-            label = stringResource(R.string.campo_contrasena),
-            visible = state.passwordVisible,
-            onToggleVisible = viewModel::togglePasswordVisible,
-            error = state.passwordError?.let { stringResource(it) },
-            testTag = "login_password",
-            imeAction = ImeAction.Done,
-            enabled = !state.submitting,
-            onImeAction = viewModel::submit,
-        )
-
-        state.message?.let { message ->
-            StatusBanner(
-                iconRes = R.drawable.ic_error,
-                title = stringResource(R.string.estado_error_titulo),
-                message = message.asString(),
-                background = LocalStatusColors.current.error,
-                modifier = Modifier.testTag("login_error"),
+        Column(
+            modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = stringResource(R.string.login_titulo),
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 24.dp).semantics { heading() },
             )
-        }
+            Text(
+                text = stringResource(R.string.login_subtitulo),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
 
-        SubmitButton(
-            text = stringResource(R.string.login_boton),
-            submitting = state.submitting,
-            onClick = viewModel::submit,
-            testTag = "login_submit",
-        )
+            if (!state.reasonDismissed) LogoutReasonBanner(reason)
+            if (state.unsupportedRole) UnsupportedRoleBanner()
 
-        TextButton(onClick = onRegister, modifier = Modifier.testTag("login_register")) {
-            Text(stringResource(R.string.login_crear_cuenta))
-        }
-        TextButton(onClick = onForgotPassword, modifier = Modifier.testTag("login_forgot")) {
-            Text(stringResource(R.string.login_olvide_contrasena))
-        }
-        TextButton(onClick = onResendVerification, modifier = Modifier.testTag("login_resend")) {
-            Text(stringResource(R.string.login_reenviar_verificacion))
-        }
+            FormTextField(
+                value = state.email,
+                onValueChange = viewModel::onEmailChange,
+                label = stringResource(R.string.campo_correo),
+                error = state.emailError?.let { stringResource(it) },
+                testTag = "login_email",
+                keyboardType = KeyboardType.Email,
+                contentType = ContentType.Username + ContentType.EmailAddress,
+                enabled = !state.submitting,
+            )
+            PasswordField(
+                value = state.password,
+                onValueChange = viewModel::onPasswordChange,
+                label = stringResource(R.string.campo_contrasena),
+                visible = state.passwordVisible,
+                onToggleVisible = viewModel::togglePasswordVisible,
+                error = state.passwordError?.let { stringResource(it) },
+                testTag = "login_password",
+                imeAction = ImeAction.Done,
+                enabled = !state.submitting,
+                onImeAction = viewModel::submit,
+            )
 
-        if (diagnostics != null) {
-            var expanded by rememberSaveable { mutableStateOf(false) }
-            TextButton(onClick = { expanded = !expanded }) {
-                Text(stringResource(if (expanded) R.string.diagnostico_ocultar else R.string.diagnostico_mostrar))
+            state.message?.let { message ->
+                StatusBanner(
+                    iconRes = R.drawable.ic_error,
+                    title = stringResource(R.string.estado_error_titulo),
+                    message = message.asString(),
+                    background = LocalStatusColors.current.error,
+                    modifier = Modifier.testTag("login_error"),
+                )
             }
-            if (expanded) diagnostics()
+
+            SubmitButton(
+                text = stringResource(R.string.login_boton),
+                submitting = state.submitting,
+                onClick = viewModel::submit,
+                testTag = "login_submit",
+            )
+            LinkButton(stringResource(R.string.login_olvide_contrasena), onForgotPassword, Modifier.testTag("login_forgot"))
+            SecondaryButton(
+                text = stringResource(R.string.login_crear_cuenta),
+                onClick = onRegister,
+                modifier = Modifier.padding(top = 8.dp).testTag("login_register"),
+            )
+            LinkButton(stringResource(R.string.login_reenviar_verificacion), onResendVerification, Modifier.testTag("login_resend"), muted = true)
+
+            if (diagnostics != null) {
+                var expanded by rememberSaveable { mutableStateOf(false) }
+                LinkButton(
+                    text = stringResource(if (expanded) R.string.diagnostico_ocultar else R.string.diagnostico_mostrar),
+                    onClick = { expanded = !expanded },
+                    muted = true,
+                )
+                if (expanded) diagnostics()
+            }
         }
     }
 }
@@ -169,30 +181,13 @@ private fun UnsupportedRoleBanner() {
 /** Botón principal que se deshabilita y muestra progreso mientras se envía. */
 @Composable
 fun SubmitButton(text: String, submitting: Boolean, onClick: () -> Unit, testTag: String) {
-    Button(
-        onClick = onClick,
-        enabled = !submitting,
-        modifier = Modifier.fillMaxWidth().testTag(testTag),
-    ) {
-        if (submitting) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(18.dp),
-                strokeWidth = 2.dp,
-                color = MaterialTheme.colorScheme.onPrimary,
-            )
-            Spacer(Modifier.width(8.dp))
-        }
-        Text(text)
-    }
+    PrimaryButton(text = text, onClick = onClick, loading = submitting, modifier = Modifier.testTag(testTag))
 }
 
 @Composable
 fun DiagnosticsCard(viewModel: DiagnosticsViewModel, apiBaseUrl: String) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
+    GroupedCard {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.diagnostico_titulo), style = MaterialTheme.typography.titleSmall)
             Text(stringResource(R.string.diagnostico_url, apiBaseUrl), style = MaterialTheme.typography.bodySmall)
@@ -215,7 +210,7 @@ fun DiagnosticsCard(viewModel: DiagnosticsViewModel, apiBaseUrl: String) {
                     background = LocalStatusColors.current.error,
                 )
             }
-            OutlinedButton(onClick = viewModel::refresh) { Text(stringResource(R.string.estado_reintentar)) }
+            SecondaryButton(text = stringResource(R.string.estado_reintentar), onClick = viewModel::refresh)
         }
     }
 }

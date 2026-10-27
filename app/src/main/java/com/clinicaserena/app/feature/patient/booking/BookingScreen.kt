@@ -1,35 +1,40 @@
 package com.clinicaserena.app.feature.patient.booking
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.clinicaserena.app.R
@@ -39,9 +44,20 @@ import com.clinicaserena.app.core.ui.FailureContent
 import com.clinicaserena.app.core.ui.LoadState
 import com.clinicaserena.app.core.ui.asString
 import com.clinicaserena.app.core.ui.components.EmptyState
+import com.clinicaserena.app.core.ui.components.FieldShape
+import com.clinicaserena.app.core.ui.components.GroupedCard
+import com.clinicaserena.app.core.ui.components.GroupedRow
+import com.clinicaserena.app.core.ui.components.GroupedSectionHeader
+import com.clinicaserena.app.core.ui.components.HairlineDivider
 import com.clinicaserena.app.core.ui.components.LoadingState
+import com.clinicaserena.app.core.ui.components.PractitionerAvatar
+import com.clinicaserena.app.core.ui.components.PrimaryButton
+import com.clinicaserena.app.core.ui.components.SecondaryButton
 import com.clinicaserena.app.core.ui.components.StatusBanner
+import com.clinicaserena.app.core.ui.components.serenaFieldColors
+import com.clinicaserena.app.core.ui.theme.LocalSerenaColors
 import com.clinicaserena.app.core.ui.theme.LocalStatusColors
+import com.clinicaserena.app.domain.model.Practitioner
 import com.clinicaserena.app.domain.model.Slot
 import com.clinicaserena.app.feature.auth.SubmitButton
 import com.clinicaserena.app.feature.common.BackScaffold
@@ -98,13 +114,16 @@ private fun SpecialtyStep(state: BookingUiState, viewModel: BookingViewModel) {
         is LoadState.Loaded -> if (load.data.isEmpty()) {
             EmptyState(message = stringResource(R.string.reserva_sin_especialidades), scrollable = false)
         } else {
-            load.data.forEach { specialty ->
-                ChoiceCard(
-                    title = specialty.name,
-                    subtitle = specialty.description,
-                    testTag = "specialty_${specialty.id}",
-                    onClick = { viewModel.selectSpecialty(specialty) },
-                )
+            GroupedCard {
+                load.data.forEachIndexed { index, specialty ->
+                    if (index > 0) HairlineDivider(startIndent = 16.dp)
+                    ChoiceRow(
+                        title = specialty.name,
+                        subtitle = specialty.description,
+                        testTag = "specialty_${specialty.id}",
+                        onClick = { viewModel.selectSpecialty(specialty) },
+                    )
+                }
             }
         }
     }
@@ -119,13 +138,17 @@ private fun PractitionerStep(state: BookingUiState, viewModel: BookingViewModel)
         is LoadState.Loaded -> if (load.data.isEmpty()) {
             EmptyState(message = stringResource(R.string.reserva_sin_medicos), scrollable = false)
         } else {
-            load.data.forEach { practitioner ->
-                ChoiceCard(
-                    title = practitioner.fullName,
-                    subtitle = practitioner.specialtyName,
-                    testTag = "practitioner_${practitioner.id}",
-                    onClick = { viewModel.selectPractitioner(practitioner) },
-                )
+            GroupedCard {
+                load.data.forEachIndexed { index, practitioner ->
+                    if (index > 0) HairlineDivider(startIndent = 76.dp)
+                    ChoiceRow(
+                        title = practitioner.fullName,
+                        subtitle = practitioner.specialtyName,
+                        testTag = "practitioner_${practitioner.id}",
+                        onClick = { viewModel.selectPractitioner(practitioner) },
+                        leading = { PractitionerAvatar(practitioner.fullName, practitioner.photoUrl, 48.dp) },
+                    )
+                }
             }
         }
     }
@@ -149,21 +172,18 @@ private fun SlotStep(state: BookingUiState, viewModel: BookingViewModel) {
         is LoadState.Failed -> FailureContent(load.failure, onRetry = viewModel::loadSlots, scrollable = false)
         is LoadState.Loaded -> if (load.data.isEmpty()) {
             EmptyState(message = stringResource(R.string.reserva_sin_horarios), scrollable = false)
-            OutlinedButton(onClick = viewModel::loadSlots) { Text(stringResource(R.string.perfil_actualizar)) }
+            SecondaryButton(text = stringResource(R.string.perfil_actualizar), onClick = viewModel::loadSlots)
         } else {
-            Text(stringResource(R.string.reserva_horarios_zona), style = MaterialTheme.typography.bodySmall)
+            Text(
+                stringResource(R.string.reserva_horarios_zona),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             load.data.groupBy { ClinicTime.localDate(it.startAt) }.forEach { (_, slots) ->
-                Text(
-                    ClinicTime.formatDay(slots.first().startAt).replaceFirstChar { it.uppercase() },
-                    style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.semantics { heading() },
-                )
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                GroupedSectionHeader(ClinicTime.formatDay(slots.first().startAt))
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     slots.forEach { slot ->
-                        OutlinedButton(
-                            onClick = { viewModel.selectSlot(slot) },
-                            modifier = Modifier.testTag("slot_${slot.id}"),
-                        ) { Text(slotRange(slot)) }
+                        SlotButton(slotRange(slot), onClick = { viewModel.selectSlot(slot) }, testTag = "slot_${slot.id}")
                     }
                 }
             }
@@ -174,13 +194,10 @@ private fun SlotStep(state: BookingUiState, viewModel: BookingViewModel) {
 @Composable
 private fun ConfirmStep(state: BookingUiState, viewModel: BookingViewModel) {
     val slot = state.slot ?: return
-    Card(
-        modifier = Modifier.fillMaxWidth().testTag("booking_summary"),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
+    GroupedCard(modifier = Modifier.testTag("booking_summary")) {
         Column(Modifier.padding(16.dp)) {
             state.specialty?.let { InfoRow(stringResource(R.string.cita_especialidad), it.name) }
-            state.practitioner?.let { InfoRow(stringResource(R.string.cita_medico), it.fullName) }
+            state.practitioner?.let { PractitionerSummaryRow(it) }
             InfoRow(stringResource(R.string.cita_fecha_hora), ClinicTime.formatDateTime(slot.startAt))
             InfoRow(stringResource(R.string.reserva_duracion), slotRange(slot))
         }
@@ -197,6 +214,8 @@ private fun ConfirmStep(state: BookingUiState, viewModel: BookingViewModel) {
         },
         isError = state.notesError != null,
         enabled = !state.submitting,
+        shape = FieldShape,
+        colors = serenaFieldColors(),
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp).testTag("booking_notes"),
     )
@@ -236,40 +255,68 @@ private fun DoneStep(state: BookingUiState, onViewAppointments: () -> Unit, onEx
         background = LocalStatusColors.current.success,
         modifier = Modifier.testTag("booking_done"),
     )
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
+    GroupedCard {
         Column(Modifier.padding(16.dp)) {
             state.specialty?.let { InfoRow(stringResource(R.string.cita_especialidad), it.name) }
-            state.practitioner?.let { InfoRow(stringResource(R.string.cita_medico), it.fullName) }
+            state.practitioner?.let { PractitionerSummaryRow(it) }
             InfoRow(stringResource(R.string.cita_fecha_hora), ClinicTime.formatDateTime(booked.scheduledAt))
             booked.notes?.takeIf { it.isNotBlank() }?.let { InfoRow(stringResource(R.string.cita_notas), it) }
         }
     }
-    Button(onClick = onViewAppointments, modifier = Modifier.fillMaxWidth().testTag("booking_view_appointments")) {
-        Text(stringResource(R.string.ver_mis_citas))
-    }
-    OutlinedButton(onClick = onExit, modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(R.string.reserva_volver_inicio))
+    PrimaryButton(
+        text = stringResource(R.string.ver_mis_citas),
+        onClick = onViewAppointments,
+        modifier = Modifier.testTag("booking_view_appointments"),
+    )
+    SecondaryButton(text = stringResource(R.string.reserva_volver_inicio), onClick = onExit)
+}
+
+/** Opción de la reserva (especialidad o médico): fila de lista agrupada con chevron; toda la fila es un botón. */
+@Composable
+private fun ChoiceRow(
+    title: String,
+    subtitle: String?,
+    testTag: String,
+    onClick: () -> Unit,
+    leading: (@Composable () -> Unit)? = null,
+) {
+    GroupedRow(onClick = onClick, testTag = testTag, leading = leading) {
+        Text(title, style = MaterialTheme.typography.titleMedium)
+        subtitle?.takeIf { it.isNotBlank() }?.let {
+            Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }
 
+/** Horario libre: botón de tarjeta (48 dp mínimo) con el rango; tocarlo abre la confirmación. */
 @Composable
-private fun ChoiceCard(title: String, subtitle: String?, testTag: String, onClick: () -> Unit) {
-    Card(
+private fun SlotButton(text: String, onClick: () -> Unit, testTag: String) {
+    val colors = LocalSerenaColors.current
+    val shape = RoundedCornerShape(14.dp)
+    Text(
+        text,
+        style = MaterialTheme.typography.bodyLarge,
+        color = colors.text,
+        textAlign = TextAlign.Center,
         modifier = Modifier
-            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+            .shadow(4.dp, shape, ambientColor = colors.cardShadow, spotColor = colors.cardShadow)
+            .clip(shape)
+            .background(colors.card)
+            .border(1.dp, colors.separator, shape)
+            .clickable(role = Role.Button, onClick = onClick)
             .testTag(testTag)
-            .clickable(role = Role.Button, onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
-        Column(Modifier.padding(16.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            subtitle?.takeIf { it.isNotBlank() }?.let {
-                Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        }
+            .padding(horizontal = 16.dp, vertical = 13.dp),
+    )
+}
+
+/** Fila «Médico» del resumen con su foto pública (o iniciales). */
+@Composable
+private fun PractitionerSummaryRow(practitioner: Practitioner) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
+        PractitionerAvatar(practitioner.fullName, practitioner.photoUrl, 64.dp)
+        Spacer(Modifier.width(12.dp))
+        Box(Modifier.weight(1f)) { InfoRow(stringResource(R.string.cita_medico), practitioner.fullName) }
     }
 }
 

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fondo de la ventana en modo noche, igual al fondo de la app (evita un destello claro al abrir). -->
+    <color name="serena_fondo">#FF0B1020</color>
+</resources>
