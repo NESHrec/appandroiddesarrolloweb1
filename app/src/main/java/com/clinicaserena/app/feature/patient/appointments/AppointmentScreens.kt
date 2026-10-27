@@ -43,6 +43,7 @@ import com.clinicaserena.app.domain.model.AppointmentStatus
 import com.clinicaserena.app.feature.common.BackScaffold
 import com.clinicaserena.app.feature.common.InfoRow
 import com.clinicaserena.app.feature.common.StatusChip
+import com.clinicaserena.app.feature.patient.push.PushRemindersInvitation
 import java.util.Locale
 
 // ---------------------------------------------------------------- Inicio
@@ -87,6 +88,7 @@ fun PatientHomeScreen(
         OutlinedButton(onClick = onSeeAll, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.ver_mis_citas))
         }
+        PushRemindersInvitation()
     }
 }
 

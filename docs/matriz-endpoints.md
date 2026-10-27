@@ -46,6 +46,8 @@ La columna «Errores manejados» lista los códigos que tienen un mensaje o un c
 | `/pacientes/me/recetas` | GET | PACIENTE | Recetas | Genéricos; vacío | B3, E1a |
 | `/pacientes/me/perfil` | GET | PACIENTE | Mi perfil | Genéricos | B3 |
 | `/pacientes/me/perfil` | PATCH | PACIENTE | Mi perfil → Editar nombre | 400 `VALIDATION_ERROR` por campo. 401: conserva el cambio y reintenta tras el re-login | B3 |
+| `/pacientes/me/dispositivos-push` | PUT | PACIENTE | Sin pantalla propia: tras el login, al renovar el token y al volver a la app. Estado en Inicio (invitación) y Mi perfil → Recordatorios de citas. Cuerpo `{token, platform:"ANDROID"}`, 204 | 409 `PUSH_NOT_ENABLED` y 400 `PUSH_TOKEN_NOT_SIMULATED`: «No disponibles», sin error. 401: espera el re-login y vuelve a registrar. Red o 5xx: «No se pudieron activar» con Reintentar. Solo muestra «Activados» tras el 204 | FCM (backend `f483454`) |
+| `/pacientes/me/dispositivos-push/retiro` | POST | PACIENTE | Cerrar sesión (antes de `/auth/logout`) y al revocar el permiso de notificaciones. Cuerpo `{token}`, 204 | De mejor esfuerzo (5 s): `/auth/logout` también retira el dispositivo de esa sesión y después se borra el token en FCM | FCM (backend `f483454`) |
 
 ## Médico
 
@@ -81,7 +83,7 @@ Quedan fuera del alcance de la app (ADMIN y RECEPCION), o existen pero no se int
 
 | Necesidad | Estado |
 |---|---|
-| Notificaciones push (registrar, rotar y retirar el token del dispositivo; recordatorios) | No hay endpoint. Fase D, como tarea de backend separada |
+| Notificaciones push | Registro y retiro existen en `feature/firebase-push-notifications` (`f483454`), aún sin fusionar en `desarrollo`. No hay envío inmediato: solo recordatorios programados 24 h antes |
 | Paginación en `/medico/citas` | No existe; `limit` máximo 100. La app avisa si el resultado puede estar incompleto |
 | Métricas del médico (pacientes atendidos, etc.) | No hay endpoint; el conteo se calcula en el cliente sobre `/medico/citas` |
 | Listado o búsqueda de pacientes propios del médico (`/medico/pacientes`) | No existe; al paciente se llega por una cita |

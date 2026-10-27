@@ -20,7 +20,7 @@ Documentos relacionados:
 | Backend | `Backproyectodesarolloodonto1`, rama `desarrollo` |
 | Emulador | AVD con Android 16 (API 36), por ejemplo Pixel 9 Pro XL |
 
-Versiones de la app: AGP 9.4.1, Kotlin 2.4.20, Gradle 9.8.1, Compose BOM 2026.09.00, Retrofit 3.0.0, OkHttp 5.5.0 y kotlinx.serialization 1.11.0; `minSdk 26`, `targetSdk 36` y `compileSdk 37`.
+Versiones de la app: AGP 9.4.1, Kotlin 2.4.20, Gradle 9.8.1, Compose BOM 2026.09.00, Retrofit 3.0.0, OkHttp 5.5.0, kotlinx.serialization 1.11.0, Firebase BoM 35.1.0 (`firebase-messaging` 26.0.1) y plugin `google-services` 4.5.0; `minSdk 26`, `targetSdk 36` y `compileSdk 37`.
 
 > **targetSdk sigue en 36.** Subir a 37 (Android 17) queda pendiente hasta probar la app en un dispositivo con Android 17, por dos cambios que afectan a la app:
 > - **Red local:** Android 17 exige el permiso `ACCESS_LOCAL_NETWORK`, y `10.0.0.0/8` (que incluye `10.0.2.2`, la dirección del emulador hacia la computadora) cuenta como red local.
@@ -42,8 +42,8 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 
 ```
 app/src/main/java/com/clinicaserena/app/
-  core/      network (Retrofit, errores tipados), security (sesión cifrada con Keystore), time, ui
-  data/      repositorios y DTO por área (auth, catalog, patient, doctor)
+  core/      network (Retrofit, errores tipados), security (sesión cifrada con Keystore), push (FCM), time, ui
+  data/      repositorios y DTO por área (auth, catalog, patient, doctor, push)
   domain/    modelos de pantalla
   feature/   pantallas y ViewModels (auth, patient, doctor, clinical, common)
 app/src/debug/     registro HTTP (nivel BASIC, sin cuerpos) y herramientas de prueba de sesión
@@ -215,7 +215,26 @@ $ANDROID_HOME/build-tools/36.0.0/apksigner verify --print-certs app/build/output
 - Cuando se suba a targetSdk 37, el certificado del servidor deberá venir de una autoridad pública, por la Certificate Transparency que Android 17 activa por defecto.
 - **R8:** el `mapping.txt` de cada release queda en `app/build/outputs/mapping/release/`, ignorado por git. Guárdalo fuera del repo junto con el APK entregado para poder leer los stack traces.
 
-## 7. Solución de problemas
+## 7. Notificaciones push (Firebase Cloud Messaging)
+
+Recordatorios de cita para el **PACIENTE**: el backend envía uno por cita, entre 24 y 22 horas antes, solo con fecha y hora. La app no tiene un endpoint de envío inmediato ni datos clínicos en la notificación.
+
+**`google-services.json` (no está en git).** El plugin `google-services` lo exige para compilar cualquier variante. Se descarga del proyecto Firebase `clinica-serena-push` (Firebase Console → Configuración del proyecto → Tus apps → Android) y debe traer **dos clientes**: `com.clinicaserena.app` (debug y release) y `com.clinicaserena.app.qa` (qaLocal). Se copia en `app/google-services.json`; `.gitignore` lo excluye junto con `app/src/*/google-services.json`. Ese archivo no contiene claves privadas; **nunca** se agrega a la app la clave de una cuenta de servicio (esa es del servidor).
+
+```bash
+cp ~/Desktop/clinica-serena-local/firebase/google-services.json app/google-services.json
+```
+
+**Flujo en la app** (`core/push/PushRegistrationManager.kt`):
+- El SDK no genera token al instalar (`firebase_messaging_auto_init_enabled=false`). Tras el login de un PACIENTE, si las notificaciones están permitidas, pide el token a FCM y lo registra con `PUT /pacientes/me/dispositivos-push`. Nunca para MEDICO.
+- El permiso `POST_NOTIFICATIONS` (Android 13+) se pide en contexto: una invitación en Inicio («Ahora no» la oculta en esa sesión) y la sección **Recordatorios de citas** en Mi perfil, con «Abrir ajustes» si se rechazó. «Activados» aparece solo tras el 204.
+- Renovación del token (`onNewToken`) o login nuevo: se vuelve a registrar (es idempotente). El token no se guarda en disco ni se escribe en logs.
+- **Cerrar sesión:** `POST …/dispositivos-push/retiro` con el Bearer aún válido, luego `/auth/logout` (que también retira el dispositivo de esa sesión) y al final `deleteToken()` en FCM. Si no hay red, una marca persistente reintenta el borrado en el siguiente cierre o login de otra cuenta.
+- **Vencimiento de la sesión (30 min):** no retira el dispositivo, igual que el backend; el paciente sigue recibiendo recordatorios.
+
+**Backend local con FCM** (sin editar `.env`): `CLINICA_PUSH_PROVIDER=FIREBASE`, `CLINICA_PUSH_REMINDERS_ENABLED=false` y `GOOGLE_CLOUD_PROJECT=clinica-serena-push`, con credenciales de usuario de `gcloud auth application-default login` (no una clave de cuenta de servicio). Con el perfil `dev` el proveedor por defecto es `SIMULATED`, que rechaza tokens reales (400 `PUSH_TOKEN_NOT_SIMULATED`); con `NONE` responde 409 `PUSH_NOT_ENABLED`. La app muestra ambos casos como «No disponibles».
+
+## 8. Solución de problemas
 
 | Síntoma | Causa probable y solución |
 |---|---|
@@ -231,6 +250,9 @@ $ANDROID_HOME/build-tools/36.0.0/apksigner verify --print-certs app/build/output
 | Médico: no puede registrar la atención | El detalle de la cita explica el motivo: falta la llegada (recepción), la cita aún no empieza, ya tiene atención o fue cancelada o completada |
 | `SDK location not found` al compilar | Define `ANDROID_HOME` o `sdk.dir` en `local.properties` |
 | El release falla con «clinicaSerena.releaseApiBaseUrl debe usar HTTPS» o con un mensaje de «Firma: …» | Revisa la URL y el archivo de firma (secciones 5 y 6) |
+| No compila: `File google-services.json is missing` o `No matching client found for package name` | Falta `app/google-services.json` o no trae el cliente de esa variante (qaLocal usa `com.clinicaserena.app.qa`). Ver la sección 7 |
+| Recordatorios: «No disponibles» | El backend tiene el proveedor push en `NONE` (409 `PUSH_NOT_ENABLED`) o en `SIMULATED` (400 `PUSH_TOKEN_NOT_SIMULATED`). Ver la sección 7 |
+| Recordatorios: «No se pudieron activar» sin error del servidor | FCM no entregó token: emulador o teléfono sin Google Play Services, Play Services desactualizado o sin red |
 | Instalar el release sobre el debug falla por firma distinta | Son llaves distintas; desinstala primero, o usa `qaLocal`, que se instala aparte |
 
 ## Seguridad y privacidad
@@ -239,11 +261,12 @@ $ANDROID_HOME/build-tools/36.0.0/apksigner verify --print-certs app/build/output
 - **Registro HTTP:** solo en debug, nivel BASIC, sin cabeceras ni cuerpos. Release y qaLocal no incluyen el interceptor.
 - **Datos clínicos:** se muestran desde memoria y se borran al cerrar sesión. No hay caché persistente.
 - **Autorización:** la app no autoriza nada con IDs de la UI; Spring valida cada operación. Todo recurso de otro médico responde 404.
+- **Push:** el token FCM no se escribe en logs, no se guarda en disco y viaja solo en el cuerpo (nunca en la URL). La notificación trae solo fecha y hora. `google-services.json` no se versiona y la app nunca lleva claves de cuentas de servicio.
 - **APK y secretos:** no se suben al repositorio APK, `.env`, keystores, `.properties` de firma ni informes locales.
 
 ## Pendientes conocidos
 
-- Notificaciones push (Fase D): requieren endpoints nuevos en el backend.
+- Notificaciones push: la entrega real en staging y la activación en producción dependen del backend (credencial de servidor y `CLINICA_PUSH_PROVIDER=FIREBASE`). La app usa `getToken`/`deleteToken`, obsoletos desde `firebase-messaging` 25.1.0; migrar al registro por Installation ID cuando el backend lo valide.
 - Subir `targetSdk` a 37 tras probar en Android 17.
 - Definir la URL HTTPS de producción y la custodia de la llave definitiva.
 - Dependencias de backend que faltan: ver el final de [`docs/matriz-endpoints.md`](docs/matriz-endpoints.md).

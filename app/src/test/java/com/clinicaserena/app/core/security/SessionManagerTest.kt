@@ -315,4 +315,49 @@ class SessionManagerTest {
         assertNull(f.store.load())
     }
 
+    // --- Avisos de sesión (registro push) ---
+
+    @Test
+    fun `logout avisa antes de llamar a Spring y despues de cerrar`() = runTest {
+        val f = fixture()
+        f.manager.login("paciente@ejemplo.invalid", "clave")
+
+        f.manager.logout()
+
+        assertEquals(listOf("antes:PACIENTE:logouts=0", "cerrada:logouts=1"), f.events.events)
+    }
+
+    @Test
+    fun `logout fallido no avisa cierre porque la sesion sigue`() = runTest {
+        val f = fixture()
+        f.manager.login("paciente@ejemplo.invalid", "clave")
+        f.auth.logoutResult = ApiResult.NetworkError
+
+        f.manager.logout()
+
+        assertEquals(listOf("antes:PACIENTE:logouts=0"), f.events.events)
+    }
+
+    @Test
+    fun `cerrar solo local y abandonar el re-login avisan cierre`() = runTest {
+        val f = fixture()
+        f.manager.login("paciente@ejemplo.invalid", "clave")
+        f.manager.logoutLocalOnly()
+        f.manager.login("paciente@ejemplo.invalid", "clave")
+        f.manager.expire()
+        f.manager.abandonExpiredSession()
+
+        assertEquals(listOf("cerrada:logouts=0", "cerrada:logouts=0"), f.events.events)
+    }
+
+    @Test
+    fun `el vencimiento de la sesion no avisa cierre`() = runTest {
+        val f = fixture()
+        f.manager.login("paciente@ejemplo.invalid", "clave")
+
+        f.manager.expire()
+        runCurrent()
+
+        assertTrue(f.events.events.isEmpty())
+    }
 }

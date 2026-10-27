@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import com.clinicaserena.app.core.network.ApiResult
 import com.clinicaserena.app.core.security.FakeTokenCipher
+import com.clinicaserena.app.core.security.SessionEvents
 import com.clinicaserena.app.core.security.SessionManager
 import com.clinicaserena.app.core.security.SessionStore
 import com.clinicaserena.app.data.auth.AuthRepository
@@ -12,6 +13,7 @@ import com.clinicaserena.app.data.auth.UnifiedLogin
 import com.clinicaserena.app.domain.model.AccountType
 import com.clinicaserena.app.domain.model.Identity
 import com.clinicaserena.app.domain.model.Role
+import com.clinicaserena.app.domain.model.Session
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -92,11 +94,25 @@ class FakeAuthRepository : AuthRepository {
     }
 }
 
+/** Registra los avisos de sesión y cuántos logout había hecho Spring en ese momento. */
+class RecordingSessionEvents(private val auth: FakeAuthRepository) : SessionEvents {
+    val events = mutableListOf<String>()
+
+    override suspend fun beforeLogout(session: Session) {
+        events += "antes:${session.role}:logouts=${auth.logouts.size}"
+    }
+
+    override suspend fun signedOut() {
+        events += "cerrada:logouts=${auth.logouts.size}"
+    }
+}
+
 class SessionFixture(scope: CoroutineScope) {
     val cipher = FakeTokenCipher()
     val store = SessionStore(InMemoryPreferencesDataStore(), cipher)
     val auth = FakeAuthRepository()
-    val manager = SessionManager(store, { auth }, TEST_CLOCK, scope)
+    val events = RecordingSessionEvents(auth)
+    val manager = SessionManager(store, { auth }, TEST_CLOCK, scope, { events })
 }
 
 /** Catálogo configurable que cuenta las llamadas a disponibilidad. */

@@ -64,6 +64,18 @@ sealed interface LogoutOutcome {
 }
 
 /**
+ * Avisos a otros módulos (por ejemplo, el registro push) en los cierres de sesión explícitos. El
+ * vencimiento de la sesión no los dispara.
+ */
+interface SessionEvents {
+    /** Antes de llamar al logout de Spring, con el Bearer todavía válido. */
+    suspend fun beforeLogout(session: Session) {}
+
+    /** La persona cerró sesión en este teléfono (logout confirmado, solo local o abandono del re-login). */
+    suspend fun signedOut() {}
+}
+
+/**
  * Fuente única de la sesión. El token vive en memoria para el `AuthInterceptor` y cifrado en
  * [SessionStore]. Los borradores de formularios viven en sus ViewModel y no se tocan al vencer.
  */
@@ -72,6 +84,7 @@ class SessionManager(
     private val authRepository: () -> AuthRepository,
     private val clock: Clock,
     private val scope: CoroutineScope,
+    private val events: () -> SessionEvents = { NO_EVENTS },
 ) {
     private val _state = MutableStateFlow<SessionState>(SessionState.Checking)
     val state: StateFlow<SessionState> = _state.asStateFlow()
@@ -200,9 +213,11 @@ class SessionManager(
             clearLocal(LogoutReason.NONE)
             return LogoutOutcome.Done
         }
+        events().beforeLogout(session)
         return when (val result = authRepository().logout(session.accountType)) {
             is ApiResult.Success, is ApiResult.Unauthenticated -> {
                 clearLocal(LogoutReason.NONE)
+                events().signedOut()
                 LogoutOutcome.Done
             }
             is ApiResult.Failure -> LogoutOutcome.Failed(result)
@@ -212,11 +227,13 @@ class SessionManager(
     /** El usuario eligió cerrar solo en este dispositivo: la sesión del servidor vence sola por TTL. */
     suspend fun logoutLocalOnly() {
         clearLocal(LogoutReason.LOCAL_ONLY)
+        events().signedOut()
     }
 
     /** Desde la hoja de re-login: abandona la sesión vencida (su token ya no sirve) y descarta borradores. */
     suspend fun abandonExpiredSession() {
         clearLocal(LogoutReason.NONE)
+        events().signedOut()
     }
 
     /** Llamado por [com.clinicaserena.app.core.network.ApiCaller] ante un 401 `UNAUTHENTICATED`. */
@@ -262,5 +279,6 @@ class SessionManager(
         /** Margen para no usar un token que vence durante una petición. */
         const val EXPIRY_MARGIN_SECONDS = 30L
         const val DEBUG_INVALID_TOKEN = "token-invalido-simulado"
+        val NO_EVENTS = object : SessionEvents {}
     }
 }

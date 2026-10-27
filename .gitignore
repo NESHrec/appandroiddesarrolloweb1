@@ -39,3 +39,7 @@ cuentas-prueba.env
 # Firma fuera del repo (protección adicional)
 signing*.properties
 /firma/
+
+# Configuración de Firebase: se copia localmente (ver README), no se versiona
+app/google-services.json
+app/src/*/google-services.json

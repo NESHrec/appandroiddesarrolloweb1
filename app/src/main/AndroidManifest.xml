@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Android 13+: se pide en contexto, desde el área del paciente, nunca al abrir la app. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!--
       Respaldos: la sesión cifrada no debe salir del dispositivo. allowBackup=false desactiva el
@@ -31,6 +33,31 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--
+          Recordatorios push (FCM). El SDK no crea token por sí solo: el registro empieza solo tras el
+          login de un PACIENTE (PushRegistrationManager activa el auto-init). Nunca para MEDICO.
+        -->
+        <service
+            android:name=".core.push.ClinicaSerenaMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="firebase_messaging_auto_init_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/push_canal_id" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/serena_notificacion" />
     </application>
 
 </manifest>

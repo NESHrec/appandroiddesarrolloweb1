@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    // Lee app/google-services.json (fuera de Git; ver README). Trae los clientes de debug/release y de qaLocal (.qa).
+    alias(libs.plugins.google.services)
 }
 
 import java.net.URI
@@ -142,6 +144,9 @@ dependencies {
     implementation(libs.retrofit.converter.kotlinx.serialization)
     implementation(libs.okhttp)
     debugImplementation(libs.okhttp.logging.interceptor)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

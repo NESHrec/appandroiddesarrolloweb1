@@ -387,4 +387,26 @@
     <string name="superficie_palatina">Palatina</string>
     <string name="superficie_oclusal">Oclusal</string>
     <string name="superficie_incisal">Incisal</string>
+
+    <!-- Recordatorios push (FCM). El canal_id no se traduce. -->
+    <string name="push_canal_id" translatable="false">recordatorios_citas</string>
+    <string name="push_canal_nombre">Recordatorios de citas</string>
+    <string name="push_canal_descripcion">Aviso un día antes de cada cita, solo con la fecha y la hora.</string>
+    <string name="push_titulo_por_defecto">Recordatorio de cita</string>
+    <string name="push_titulo">Recordatorios de citas</string>
+    <string name="push_explicacion">Recibe un aviso un día antes de cada cita. El aviso solo muestra la fecha y la hora, sin datos clínicos.</string>
+    <string name="push_permiso_denegado">Las notificaciones de Clínica Serena están desactivadas en este teléfono. Puedes activarlas en los ajustes.</string>
+    <string name="push_activar">Activar recordatorios</string>
+    <string name="push_abrir_ajustes">Abrir ajustes de notificaciones</string>
+    <string name="push_ahora_no">Ahora no</string>
+    <string name="push_estado_desactivados">Desactivados</string>
+    <string name="push_estado_activando">Activando…</string>
+    <string name="push_estado_activados">Activados</string>
+    <string name="push_estado_no_disponibles">No disponibles</string>
+    <string name="push_estado_error">No se pudieron activar</string>
+    <string name="push_activando">Estamos activando los recordatorios en este teléfono.</string>
+    <string name="push_activados">Recibirás en este teléfono un aviso un día antes de cada cita. Al cerrar sesión dejarás de recibirlos.</string>
+    <string name="push_no_disponibles">Los recordatorios no están disponibles por ahora. Puedes seguir consultando tus citas en la app.</string>
+    <string name="push_esperando_sesion">Inicia sesión de nuevo y activaremos los recordatorios.</string>
+    <string name="push_sin_token">No se pudo preparar este teléfono para recibir notificaciones. Revisa tu conexión y que Google Play Services esté actualizado.</string>
 </resources>

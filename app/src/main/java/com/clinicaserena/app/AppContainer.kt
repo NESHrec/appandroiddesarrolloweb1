@@ -7,6 +7,10 @@ import com.clinicaserena.app.core.network.ApiCaller
 import com.clinicaserena.app.core.network.ErrorMapper
 import com.clinicaserena.app.core.network.NetworkLogging
 import com.clinicaserena.app.core.network.NetworkModule
+import com.clinicaserena.app.core.push.AndroidNotificationPermission
+import com.clinicaserena.app.core.push.FirebasePushTokenSource
+import com.clinicaserena.app.core.push.PrefsPushTokenFlag
+import com.clinicaserena.app.core.push.PushRegistrationManager
 import com.clinicaserena.app.core.security.KeystoreTokenCipher
 import com.clinicaserena.app.core.security.SessionManager
 import com.clinicaserena.app.core.security.SessionStore
@@ -30,6 +34,8 @@ import com.clinicaserena.app.data.patient.PatientProfileApi
 import com.clinicaserena.app.data.patient.RemotePatientClinicalRepository
 import com.clinicaserena.app.data.patient.PatientProfileRepository
 import com.clinicaserena.app.data.patient.RemotePatientProfileRepository
+import com.clinicaserena.app.data.push.PushDeviceApi
+import com.clinicaserena.app.data.push.RemotePushDeviceRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -58,6 +64,7 @@ class AppContainer(context: Context) {
             authRepository = { authRepository },
             clock = clock,
             scope = appScope,
+            events = { pushRegistration },
         )
     }
 
@@ -103,6 +110,17 @@ class AppContainer(context: Context) {
 
     val patientProfileRepository: PatientProfileRepository by lazy {
         RemotePatientProfileRepository(retrofit.create(PatientProfileApi::class.java), apiCaller)
+    }
+
+    val pushRegistration: PushRegistrationManager by lazy {
+        PushRegistrationManager(
+            sessionState = sessionManager.state,
+            repository = RemotePushDeviceRepository(retrofit.create(PushDeviceApi::class.java), apiCaller),
+            tokens = FirebasePushTokenSource(),
+            permission = AndroidNotificationPermission(appContext),
+            tokenFlag = PrefsPushTokenFlag(appContext),
+            scope = appScope,
+        )
     }
 
     private companion object {

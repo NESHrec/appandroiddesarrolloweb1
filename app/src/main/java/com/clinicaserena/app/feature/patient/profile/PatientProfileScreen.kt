@@ -38,6 +38,7 @@ import com.clinicaserena.app.feature.auth.SubmitButton
 import com.clinicaserena.app.feature.common.BackScaffold
 import com.clinicaserena.app.feature.common.InfoRow
 import com.clinicaserena.app.feature.common.LogoutSection
+import com.clinicaserena.app.feature.patient.push.PushRemindersSection
 
 /** Mi perfil: datos de la cuenta, cambio de nombre y cierre de sesión. */
 @Composable
@@ -97,6 +98,7 @@ fun PatientProfileScreen(viewModel: PatientProfileViewModel, onBack: () -> Unit)
                     }
                 }
             }
+            PushRemindersSection()
             LogoutSection()
             DebugSessionTools()
         }

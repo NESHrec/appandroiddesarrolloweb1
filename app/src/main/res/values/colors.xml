@@ -2,4 +2,6 @@
 <resources>
     <color name="serena_principal">#FF62727B</color>
     <color name="serena_fondo">#FFF6FAFA</color>
+    <!-- Acento de la notificación (primario de la marca). -->
+    <color name="serena_notificacion">#FF2563EB</color>
 </resources>
